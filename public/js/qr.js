@@ -1,10 +1,27 @@
+// The quick reply is a floating window sized for a mouse, and a phone has the reply
+// form under the thread instead: `#quickReply` is hidden by the stylesheet on exactly
+// this query (public/css/global.css), and a quote goes into that form rather than into
+// a panel nobody can see. Change one and change the other.
+const QUICK_REPLY_HIDDEN = '(max-width: 768px), (hover: none) and (pointer: coarse)';
+
+function quickReplyHidden() {
+  return window.matchMedia(QUICK_REPLY_HIDDEN).matches;
+}
+
 // Put `>>id` into the quick reply, on a line of its own at the cursor, and open it. Every
 // click quotes - the same post again too, as 4chan X does. The textarea's input event is
 // fired so the reply form's copy and the character count follow.
 function insertQuote(id) {
+  const hidden = quickReplyHidden();
   const quickreplydiv = document.getElementById('quickReply');
-  const msg = document.getElementById('message-qr');
-  quickreplydiv.classList.add('show-quickreply');
+  // Where the panel is not shown, the quote goes to the reply form, which is the form
+  // a mobile poster submits; the two textareas mirror each other, so the quote ends up
+  // in the quick reply's box as well.
+  const msg = document.getElementById(hidden ? 'message' : 'message-qr');
+  // An archived thread has no reply form and cannot be posted to: there is nowhere to
+  // put the quote, and the panel is not shown there either.
+  if (!msg) return;
+  if (!hidden) quickreplydiv.classList.add('show-quickreply');
 
   const quote = `>>${id}\n`;
   const value = msg.value;

@@ -3382,6 +3382,18 @@ html {
   text-size-adjust: 100%;
 }
 
+/* The quick reply is a floating window sized for a mouse, and a phone has the reply
+   form under the thread instead, so the panel is never shown there. `qr.js` matches
+   this same query and puts a quote in that form rather than opening the panel; the
+   two have to stay in step. The id wins over the panel's own `.show-quickreply`
+   rule (views/partials/quick-reply.ejs) whether or not that is set, so nothing can
+   bring the panel back on a phone. */
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  #quickReply {
+    display: none !important;
+  }
+}
+
 @media (max-width: 768px) {
   body {
     padding: 0 4px;
