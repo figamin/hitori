@@ -14,18 +14,21 @@
 // so an inlined post has its real name, capcode, files and text - and its own quote links
 // are the real ones, which is what makes the nesting work.
 //
-// It is off unless the reader turns it on in Settings -> Posts & Threads; off, a click
-// does what it always did - jump to the post and highlight it (`markPost`). The setting
-// used to be on by default under `disablePostInlining`; that key is no longer read, so
-// everyone starts with it off.
+// It follows the reader's setting (Settings -> Posts & Threads): on unless they turned it
+// off, which is the state the panel's checkbox shows and writes. Off, a click does what it
+// always did - jump to the post and highlight it (`markPost`).
+//
+// The panel writes `disablePostInlining` (`settings.js`); this used to read an
+// `enablePostInlining` key that nothing ever wrote, so the feature stayed off for everyone -
+// including readers whose settings screen showed it on.
 (function () {
-  const ENABLE_KEY = 'enablePostInlining';
+  const DISABLE_KEY = 'disablePostInlining';
 
   // What the reader sees under a box while it loads, or when the post cannot be shown.
   const LOADING = 'Loading…';
 
   function enabled() {
-    return localStorage.getItem(ENABLE_KEY) === 'true';
+    return localStorage.getItem(DISABLE_KEY) !== 'true';
   }
 
   // The post a link points at. The hover previews already parse these urls - including
@@ -297,5 +300,5 @@
     }
   });
 
-  window.postInline = { enabled, closeAll, toggle, targetOf, ENABLE_KEY };
+  window.postInline = { enabled, closeAll, toggle, targetOf, DISABLE_KEY };
 })();
