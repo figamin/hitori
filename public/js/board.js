@@ -91,8 +91,17 @@ function generateRandomPassword() {
 
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('form[action*="/thread"]').forEach((form) => {
+    // One submission at a time; see the note in `thread.js`. Without this a double click
+    // posted the new thread twice (the second attempt then meeting the flood filter).
+    let posting = false;
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
+      if (posting) return;
+      posting = true;
+      const submitButtons = [...form.querySelectorAll('button[type="submit"], input[type="submit"]')];
+      submitButtons.forEach((button) => {
+        button.disabled = true;
+      });
       const fileInput = document.getElementById('image') || document.getElementById('standard-image');
 
       if (document.getElementById('image') && window.updateFileInput) {
@@ -194,6 +203,11 @@ document.addEventListener('DOMContentLoaded', function () {
       } catch (error) {
         console.error('Error submitting form:', error);
         alert('Error submitting form: ' + (error.message || 'Unknown error'));
+      } finally {
+        posting = false;
+        submitButtons.forEach((button) => {
+          button.disabled = false;
+        });
       }
     });
   });

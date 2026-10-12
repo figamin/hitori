@@ -361,8 +361,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Add AJAX submission for quick reply form
+  // One reply at a time; see the note in `thread.js`. A double click on Submit used to
+  // send the quick reply twice and post it twice.
+  let qrInFlight = false;
   qrForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (qrInFlight) return;
+    qrInFlight = true;
+    const qrSubmitButtons = [...qrForm.querySelectorAll('button[type="submit"], input[type="submit"]')];
+    qrSubmitButtons.forEach((button) => {
+      button.disabled = true;
+    });
 
     // Create a new FormData object
     const formData = new FormData();
@@ -486,6 +495,11 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       console.error('Error posting reply:', error);
       alert('Error posting reply');
+    } finally {
+      qrInFlight = false;
+      qrSubmitButtons.forEach((button) => {
+        button.disabled = false;
+      });
     }
   });
 

@@ -404,8 +404,20 @@ document.addEventListener('DOMContentLoaded', () => {
   const mainReplyForm = document.getElementById('reply-form');
 
   if (mainReplyForm) {
+    // One reply at a time. An impatient double click (or Enter pressed twice) used to
+    // fire two POSTs, and the moderation flood filter only refuses once a few have
+    // gone through - so the reader ended up with the same reply posted several times
+    // and a "Posting throttled by filter." on top. The flag makes the repeat submit a
+    // no-op; the button is disabled so the reader can see the request is in flight.
+    let replyInFlight = false;
     mainReplyForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      if (replyInFlight) return;
+      replyInFlight = true;
+      const submitButtons = [...mainReplyForm.querySelectorAll('button[type="submit"], input[type="submit"]')];
+      submitButtons.forEach((button) => {
+        button.disabled = true;
+      });
 
       const fileInput = document.getElementById('image');
       if (window.updateFileInput && typeof window.updateFileInput === 'function') {
@@ -563,6 +575,11 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (error) {
         console.error('Error posting reply:', error);
         alert(error.message || error.toString() || 'Unknown error');
+      } finally {
+        replyInFlight = false;
+        submitButtons.forEach((button) => {
+          button.disabled = false;
+        });
       }
     });
   }
