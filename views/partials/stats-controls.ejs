@@ -1,0 +1,29 @@
+<%
+  // Chart controls on the statistics pages, modelled on 4stats.io. `chartBoard`
+  // (passed by the caller) is the board the chart is for, or '' for site-wide; the
+  // script reads it from `data-board` to pick its endpoint. The groups are rendered
+  // whole and shown per mode by the script, so both sets exist without JavaScript.
+%>
+<div class="stats-controls" id="stats-controls" data-board="<%= chartBoard || '' %>">
+  <div class="stats-control-group">
+    <button type="button" class="stats-btn" data-mode="daily">Daily</button>
+    <button type="button" class="stats-btn" data-mode="hourly">Hourly</button>
+  </div>
+  <div class="stats-control-group stats-ranges" data-ranges="daily">
+    <button type="button" class="stats-btn" data-range="all">All</button>
+    <button type="button" class="stats-btn" data-range="5y">5y</button>
+    <button type="button" class="stats-btn" data-range="3y">3y</button>
+    <button type="button" class="stats-btn" data-range="1y">1y</button>
+    <button type="button" class="stats-btn" data-range="6m">6m</button>
+  </div>
+  <div class="stats-control-group stats-ranges" data-ranges="hourly" hidden>
+    <button type="button" class="stats-btn" data-range="4w">4w</button>
+    <button type="button" class="stats-btn" data-range="1w">1w</button>
+    <button type="button" class="stats-btn" data-range="3d">3d</button>
+  </div>
+  <div class="stats-control-group stats-dates">
+    <input type="date" id="stats-from" class="stats-date" aria-label="Start date" />
+    <span class="stats-dates-sep">&ndash;</span>
+    <input type="date" id="stats-to" class="stats-date" aria-label="End date" />
+  </div>
+</div>

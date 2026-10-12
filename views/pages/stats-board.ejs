@@ -1,0 +1,76 @@
+<%
+  title = '/' + board.boardUri + '/ - Statistics';
+  head = '<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>';
+  const data = statsData;
+  const b = data.board;
+  const totals = data.totals || {};
+  const fmt = (n) => Number(n || 0).toLocaleString('en-US');
+  const perMin = (n) => (Number(n || 0) / 1440).toFixed(2);
+  const share = (n) => (totals.posts24 ? Math.round((Number(n || 0) / totals.posts24) * 100) + '%' : '-');
+%>
+<div class="stats-page">
+  <div class="stats-breadcrumb">[<a href="/stats">Statistics</a>] /<%= board.boardUri %>/</div>
+
+  <div class="stats-header">
+    <h1 class="stats-title">
+      /<%= board.boardUri %>/
+      <span class="stats-board-name"><%= board.boardName %></span>
+    </h1>
+    <p class="stats-subtitle">
+      [<a href="/<%= encodeURIComponent(board.boardUri) %>/">Go to board</a>]
+    </p>
+  </div>
+
+  <div class="stats-cards">
+    <div class="stats-card">
+      <div class="stats-card-value"><%= fmt(b.postsTotal) %></div>
+      <div class="stats-card-label">Total posts</div>
+    </div>
+    <div class="stats-card">
+      <div class="stats-card-value"><%= fmt(b.threadsTotal) %></div>
+      <div class="stats-card-label">Total threads</div>
+    </div>
+    <div class="stats-card">
+      <div class="stats-card-value"><%= fmt(b.posts24) %></div>
+      <div class="stats-card-label">Posts (24h)</div>
+    </div>
+    <div class="stats-card">
+      <div class="stats-card-value"><%= fmt(b.threads24) %></div>
+      <div class="stats-card-label">Threads (24h)</div>
+    </div>
+    <div class="stats-card">
+      <div class="stats-card-value"><%= perMin(b.posts24) %></div>
+      <div class="stats-card-label">Posts/min</div>
+    </div>
+    <div class="stats-card">
+      <div class="stats-card-value"><%= share(b.posts24) %></div>
+      <div class="stats-card-label">Site activity (24h)</div>
+    </div>
+    <div class="stats-card">
+      <div class="stats-card-value"><%= fmt(b.posts7) %></div>
+      <div class="stats-card-label">Posts (7 days)</div>
+    </div>
+    <div class="stats-card">
+      <div class="stats-card-value"><%= fmt(b.posts30) %></div>
+      <div class="stats-card-label">Posts (30 days)</div>
+    </div>
+  </div>
+
+  <div class="stats-panel">
+    <div class="stats-panel-head">
+      <h2>Posting timeline</h2>
+      <span class="stats-panel-note" id="stats-series-note"></span>
+    </div>
+    <%- include('/partials/stats-controls', { chartBoard: board.boardUri }) %>
+    <div class="stats-chart-wrap">
+      <canvas id="stats-chart" height="90"></canvas>
+    </div>
+    <noscript><p class="stats-noscript">A JavaScript-enabled browser draws the chart here.</p></noscript>
+  </div>
+
+  <p class="stats-footer-note">
+    See every board on the <a href="/stats">statistics overview</a>.
+  </p>
+</div>
+<script>window.statsPage = <%- JSON.stringify(statsData).replace(/</g, '\\u003c') %>;</script>
+<script src="/js/stats.js?v=<%= locals.assetVersion('js/stats.js') %>"></script>

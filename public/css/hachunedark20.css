@@ -240,9 +240,8 @@ hr{
     padding: 2px 6px;
     cursor: pointer;
 }
-}
 
-.board-list{
+.board-list:not(.footer-board-list) {
     position: fixed;
     top: 0;
     left: 0;
@@ -397,23 +396,6 @@ button:hover{
     margin-bottom: 45px;
 }
 
-@media (max-width: 768px) {
-    #footer {
-        margin-bottom: 0;
-    }
-
-    .thread {
-        padding: 5px 3px;
-    }
-
-    body::before {
-        width: 140px;
-        height: 115px;
-        right: 5px;
-        opacity: 0.6;
-    }
-}
-
 .boxbar {
     background: #222;
     outline: 1px solid #222;
@@ -450,4 +432,21 @@ button:hover{
 
 #quickReply input[type="text"]{
     font-size: 11px !important;
+}
+
+@media (max-width: 768px) {
+    #footer {
+        margin-bottom: 0;
+    }
+
+    .thread {
+        padding: 5px 3px;
+    }
+
+    body::before {
+        width: 140px;
+        height: 115px;
+        right: 5px;
+        opacity: 0.6;
+    }
 }

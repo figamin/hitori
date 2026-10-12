@@ -1,4 +1,6 @@
 :root {
+    --background-color: #e1fffd;
+    --background-gradient: #e1fffd;
     --header-highlight: #befff9;
     --text-color: #137a7f;
     --border-color: #aaa;
@@ -18,7 +20,7 @@
 }
 
 body {
-  background: #e1fffd url('img/fade-miku.png') repeat-x 50% 0%;
+  background: var(--background-color) url('img/fade-miku.png') repeat-x 50% 0%;
   font-family: Tahoma;
   font-size: 9pt;
   padding-left: 0px;

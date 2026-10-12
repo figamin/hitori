@@ -1,0 +1,116 @@
+<%
+  title = siteName + ' - Statistics';
+  head = '<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>';
+  const totals = statsData.totals || {};
+  const fmt = (n) => Number(n || 0).toLocaleString('en-US');
+  // Rolling day counts, the way 4stats shows them: posts/day is the last 24 hours,
+  // posts/min its per-minute average, threads/hour the last 24 hours over 24.
+  const perMin = (n) => (Number(n || 0) / 1440).toFixed(2);
+  const perHour = (n) => (Number(n || 0) / 24).toFixed(2);
+  const share = (n) => (totals.posts24 ? Math.round((Number(n || 0) / totals.posts24) * 100) + '%' : '-');
+%>
+<div class="stats-page">
+  <div class="stats-header">
+    <h1 class="stats-title">Statistics</h1>
+    <p class="stats-subtitle">
+      Posting activity across <strong><%= fmt(statsData.boards.length) %></strong> boards,
+      updated <span class="stats-updated" data-epoch="<%= overview.generatedAt %>"></span>.
+    </p>
+  </div>
+
+  <div class="stats-cards">
+    <div class="stats-card">
+      <div class="stats-card-value"><%= fmt(totals.posts) %></div>
+      <div class="stats-card-label">Total posts</div>
+    </div>
+    <div class="stats-card">
+      <div class="stats-card-value"><%= fmt(totals.threads) %></div>
+      <div class="stats-card-label">Total threads</div>
+    </div>
+    <div class="stats-card">
+      <div class="stats-card-value"><%= fmt(totals.posts24) %></div>
+      <div class="stats-card-label">Posts (24h)</div>
+    </div>
+    <div class="stats-card">
+      <div class="stats-card-value"><%= fmt(totals.posts7) %></div>
+      <div class="stats-card-label">Posts (7 days)</div>
+    </div>
+    <div class="stats-card">
+      <div class="stats-card-value"><%= fmt(totals.posts30) %></div>
+      <div class="stats-card-label">Posts (30 days)</div>
+    </div>
+    <div class="stats-card">
+      <div class="stats-card-value"><%= fmt(totals.activeBoards24) %></div>
+      <div class="stats-card-label">Active boards (24h)</div>
+    </div>
+    <% if (siteStats) { %>
+    <div class="stats-card">
+      <div class="stats-card-value"><%= fmt(siteStats.totalUniquePosters) %></div>
+      <div class="stats-card-label">Unique posters</div>
+    </div>
+    <div class="stats-card">
+      <div class="stats-card-value"><%= fmt(siteStats.totalMediaFiles) %></div>
+      <div class="stats-card-label">Media files</div>
+    </div>
+    <% } %>
+  </div>
+
+  <div class="stats-panel">
+    <div class="stats-panel-head">
+      <h2>Site-wide posting timeline</h2>
+      <span class="stats-panel-note" id="stats-series-note"></span>
+    </div>
+    <%- include('/partials/stats-controls', { chartBoard: '' }) %>
+    <div class="stats-chart-wrap">
+      <canvas id="stats-chart" height="90"></canvas>
+    </div>
+    <noscript><p class="stats-noscript">A JavaScript-enabled browser draws the chart here; the table below carries the same figures.</p></noscript>
+  </div>
+
+  <div class="stats-panel">
+    <div class="stats-panel-head">
+      <h2>Boards</h2>
+      <span class="stats-panel-note">click a column to sort</span>
+    </div>
+    <div class="stats-table-wrap">
+      <table class="stats-table" id="stats-table">
+        <thead>
+          <tr>
+            <th data-sort="uri" class="stats-col-board">Board</th>
+            <th data-sort="posts24" class="stats-num">Posts/day</th>
+            <th data-sort="threads24" class="stats-num">Threads/day</th>
+            <th data-sort="postsMin" class="stats-num">Posts/min</th>
+            <th data-sort="threadsHour" class="stats-num">Threads/hour</th>
+            <th data-sort="share" class="stats-num">Activity</th>
+            <th data-sort="posts7" class="stats-num">Posts (7d)</th>
+            <th data-sort="posts30" class="stats-num">Posts (30d)</th>
+            <th data-sort="postsTotal" class="stats-num">Posts</th>
+            <th data-sort="threadsTotal" class="stats-num">Threads</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% boards.forEach((b) => { %>
+          <tr>
+            <td class="stats-col-board">
+              <a href="/stats/<%= encodeURIComponent(b.boardUri) %>">/<%= b.boardUri %>/</a>
+              <span class="stats-board-name" title="<%= b.boardName %>"><%= b.boardName %></span>
+            </td>
+            <td class="stats-num" data-value="<%= b.posts24 %>"><%= fmt(b.posts24) %></td>
+            <td class="stats-num" data-value="<%= b.threads24 %>"><%= fmt(b.threads24) %></td>
+            <td class="stats-num" data-value="<%= (Number(b.posts24) / 1440).toFixed(4) %>"><%= perMin(b.posts24) %></td>
+            <td class="stats-num" data-value="<%= (Number(b.threads24) / 24).toFixed(4) %>"><%= perHour(b.threads24) %></td>
+            <td class="stats-num" data-value="<%= totals.posts24 ? (Number(b.posts24) / totals.posts24) : 0 %>"><%= share(b.posts24) %></td>
+            <td class="stats-num" data-value="<%= b.posts7 %>"><%= fmt(b.posts7) %></td>
+            <td class="stats-num" data-value="<%= b.posts30 %>"><%= fmt(b.posts30) %></td>
+            <td class="stats-num" data-value="<%= b.postsTotal %>"><%= fmt(b.postsTotal) %></td>
+            <td class="stats-num" data-value="<%= b.threadsTotal %>"><%= fmt(b.threadsTotal) %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% if (!boards.length) { %><p class="stats-empty">No boards to show.</p><% } %>
+  </div>
+</div>
+<script>window.statsPage = <%- JSON.stringify(statsData).replace(/</g, '\\u003c') %>;</script>
+<script src="/js/stats.js?v=<%= locals.assetVersion('js/stats.js') %>"></script>

@@ -4208,3 +4208,251 @@ html {
 #mod-content .mod-table code {  
   word-break: break-all;
 }
+
+/* ---------------------------------------------------------------------------
+   Public statistics page (/stats, /stats/<board>)
+   The tables are rendered server-side; `stats.js` only draws the charts and adds
+   click-to-sort. Colours come from the theme variables so every theme works.
+   --------------------------------------------------------------------------- */
+.stats-page {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.stats-header {
+  margin: 0 0 14px;
+  margin-top: 20px;
+}
+
+.stats-title {
+  margin: 0 0 4px;
+}
+
+.stats-breadcrumb {
+  margin: 0 0 8px;
+  opacity: .85;
+}
+
+.stats-subtitle {
+  margin: 0;
+  opacity: .85;
+}
+
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 0 0 18px;
+}
+
+.stats-card {
+  background: var(--post-color);
+  border: 1px solid var(--border-color);
+  padding: 10px 8px;
+  text-align: center;
+}
+
+.stats-card-value {
+  font-size: 150%;
+  font-weight: bold;
+  line-height: 1.1;
+}
+
+.stats-card-label {
+  font-size: 85%;
+  opacity: .8;
+  margin-top: 2px;
+}
+
+.stats-panel {
+  background: var(--post-color);
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  margin: 0 0 18px;
+}
+
+.stats-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.stats-panel-head h2 {
+  margin: 0;
+  font-size: 120%;
+}
+
+.stats-panel-note {
+  font-size: 85%;
+  opacity: .7;
+}
+
+.stats-chart-wrap {
+  position: relative;
+  min-height: 120px;
+}
+
+.stats-chart-missing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stats-chart-missing::after {
+  content: 'Chart unavailable.';
+  opacity: .7;
+}
+
+.stats-table-wrap {
+  overflow-x: auto;
+}
+
+.stats-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--post-color);
+}
+
+.stats-table th,
+.stats-table td {
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.stats-table th {
+  background: rgba(128, 128, 128, .14);
+  text-align: left;
+}
+
+.stats-table th.stats-sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.stats-table th.stats-sortable:hover {
+  background: rgba(128, 128, 128, .22);
+}
+
+.stats-table th.stats-sort-asc::after {
+  content: ' \25B2';
+  font-size: 70%;
+}
+
+.stats-table th.stats-sort-desc::after {
+  content: ' \25BC';
+  font-size: 70%;
+}
+
+.stats-table th.stats-num,
+.stats-table td.stats-num {
+  text-align: right;
+}
+
+.stats-table tr:hover > td {
+  background: rgba(128, 128, 128, .07);
+}
+
+.stats-col-board a {
+  font-weight: bold;
+}
+
+.stats-board-name {
+  opacity: .75;
+  margin-left: 6px;
+  font-size: 90%;
+}
+
+.stats-empty,
+.stats-noscript,
+.stats-footer-note {
+  opacity: .8;
+}
+
+@media (max-width: 768px) {
+  .stats-cards {
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  }
+
+  .stats-card-value {
+    font-size: 125%;
+  }
+}
+
+/* Chart controls: the 4stats-style Daily/Hourly + range buttons and date pickers. */
+.stats-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin: 0 0 12px;
+}
+
+.stats-control-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.stats-control-group.stats-ranges[hidden] {
+  display: none;
+}
+
+.stats-btn {
+  background: rgba(128, 128, 128, .14);
+  border: 1px solid var(--border-color);
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  line-height: 1.4;
+  padding: 2px 9px;
+}
+
+.stats-btn:hover {
+  background: rgba(128, 128, 128, .28);
+}
+
+.stats-btn.active {
+  background: var(--marked-color);
+  border-color: var(--marked-border-color);
+  font-weight: bold;
+}
+
+.stats-dates {
+  gap: 6px;
+}
+
+.stats-date {
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  font: inherit;
+  padding: 1px 4px;
+}
+
+.stats-dates-sep {
+  opacity: .7;
+}
+
+/* ---------------------------------------------------------------------------
+   Statistics chart palette.
+
+   `koshi-fe/public/js/stats.js` reads these with `getComputedStyle` and redraws
+   the chart when the theme stylesheet reloads. The defaults below point at the
+   theme's own colours, so a theme styles the chart by changing them; a theme may
+   also set any `--stats-chart-*` directly to give the chart its own colour,
+   independent of links and borders. The fill under the line is derived from
+   `--stats-chart-line` unless a theme sets `--stats-chart-fill-top` /
+   `--stats-chart-fill-bottom` itself.
+   --------------------------------------------------------------------------- */
+:root {
+  --stats-chart-line: var(--name-color, var(--link-color, #8ab4f8));
+  --stats-chart-grid: var(--border-color, rgba(255, 255, 255, 0.08));
+  --stats-chart-text: var(--text-color, #b7b7b7);
+  --stats-chart-tooltip-bg: var(--post-color, rgba(20, 20, 20, 0.95));
+  --stats-chart-tooltip-border: var(--border-color, rgba(255, 255, 255, 0.15));
+  --stats-chart-tooltip-text: var(--text-color, #e0e0e0);
+}
+
