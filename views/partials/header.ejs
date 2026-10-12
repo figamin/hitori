@@ -1,11 +1,11 @@
 <noscript><style>.no-js { display: none; }</style></noscript>
 <header class="header">
   <nav class="board-list">
-    [
+    [ <a href="/">home</a> ] [
     <% var navList = locals.navBoards || []; if (navList.length) { navList.forEach(function(board, i) { %>
     <a href="/<%= board.boardUri %>/"><%= board.boardUri %></a><% if (i < navList.length - 1) { %> /<% } %>
     <% }); } %>
-    ] [ <a href="/all">all</a> ]
+    ] [ <a href="/all">all</a> ] 
   </nav>
   <div class="navtopright">
     <form class="header-search-form" action="/search" method="GET">

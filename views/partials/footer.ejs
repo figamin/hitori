@@ -1,11 +1,11 @@
 <footer id="footer">
   <% if (boardFooter) { %>
     <nav class="board-list footer-board-list">
-      [
+      [ <a href="/">home</a> ] [
       <% if (navBoards.length) { navBoards.forEach(function(board, i) { %>
       <a href="/<%= board.boardUri %>/"><%= board.boardUri %></a><% if (i < navBoards.length - 1) { %> /<% } %>
       <% }); } %>
-      ]
+      ] [ <a href="/all">all</a> ]
     </nav>
   <% } %>
     <div class="footer-nav-tools">
