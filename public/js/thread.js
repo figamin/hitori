@@ -502,8 +502,8 @@ document.addEventListener('DOMContentLoaded', () => {
             lastPostedId = result.post.postId;
             threadAutoRefresh.refreshPosts(true);
             if (typeof watchedThreads !== 'undefined') {
-              // The reply has no subject of its own; the watcher falls back to
-              // the thread's OP (or its message) for the label.
+              // A reply must not become the watched thread's label; the watcher
+              // takes it from the thread's OP (title, else the OP text).
               watchedThreads.autoWatchThread(result.post.threadId, result.post.boardUri, result.post.subject, result.post.message);
             }
           } else if (result.error) {

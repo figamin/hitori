@@ -122,27 +122,33 @@ const watchedThreads = {
     }
   },
 
-  // Label for a watched thread: its subject when it has one, otherwise the
-  // start of the post text (`:name:` style markup and files are not part of it,
-  // they render outside .thread-content).
-  threadLabel(op, subject, message) {
+  // Label for a watched thread: the thread's title when it has one, otherwise the
+  // first 15 characters of the opening post's text (`:name:` style markup and
+  // files are not part of it, they render outside .thread-content).
+  makeLabel(title, text) {
     const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim();
 
     // `'No subject'` is the placeholder older callers stored; treat it as none.
-    for (const candidate of [subject, op ? op.querySelector('.subject')?.textContent : '']) {
-      const value = clean(candidate);
-      if (value && value !== 'No subject') return value.substring(0, 50);
-    }
+    const cleanTitle = clean(title);
+    if (cleanTitle && cleanTitle !== 'No subject') return cleanTitle.substring(0, 50);
 
-    const text =
-      clean(message) ||
-      clean(
-        op
-          ? op.querySelector('.thread-content, .reply-content, .message')?.textContent || op.querySelector('.divMessage')?.textContent
-          : ''
-      );
-    if (!text) return '';
-    return text.length > 20 ? `${text.substring(0, 20)}...` : text;
+    const cleanText = clean(text);
+    if (!cleanText) return '';
+    return cleanText.length > 15 ? `${cleanText.substring(0, 15)}...` : cleanText;
+  },
+
+  // The label always comes from the thread's opening post. When the OP is on the
+  // page it is the only source, so the `subject`/`message` a caller passes for a
+  // reply can never become the title. A brand new thread (posted from the board
+  // page and redirected to before its OP renders) has no OP yet, so there the
+  // submitted subject/message are used instead.
+  threadLabel(op, subject, message) {
+    if (op) {
+      const title = op.querySelector('.subject')?.textContent;
+      const text = op.querySelector('.thread-content, .reply-content, .message')?.textContent || op.querySelector('.divMessage')?.textContent;
+      return this.makeLabel(title, text);
+    }
+    return this.makeLabel(subject, message);
   },
 
   addThreadToWatch(threadId, boardUri, subject, message) {
@@ -368,18 +374,18 @@ const watchedThreads = {
 
     let labelAdded = false;
     entries.forEach(({ board, thread, data }) => {
-      // Threads watched before labels carried the post text (or without a
-      // subject) get their label from the OP when that thread is on screen.
-      let label = data.label && data.label !== 'No subject' ? data.label : null;
-      if (!label) {
-        const op = document.querySelector(`.op[data-post-id="${thread}"], .op[data-thread-id="${thread}"]`);
-        const derived = this.threadLabel(op);
-        if (derived) {
-          label = derived;
-          data.label = derived;
-          labelAdded = true;
-        }
+      // The OP on screen is authoritative: re-derive the label so a stored one
+      // taken from a reply (or a missing one) is corrected to the thread title.
+      const op = document.querySelector(
+        `.op[data-board="${board}"][data-post-id="${thread}"], .op[data-board="${board}"][data-thread-id="${thread}"]`
+      );
+      const derived = op ? this.threadLabel(op) : '';
+      if (derived && derived !== data.label) {
+        data.label = derived;
+        labelAdded = true;
       }
+
+      let label = data.label && data.label !== 'No subject' ? data.label : null;
       label = label || `${board}/${thread}`;
       const unread = data.unreadCount > 0 || data.lastSeen < data.lastReplied;
       const item = document.createElement('div');
