@@ -136,13 +136,19 @@ function visibleFileCount() {
 function displayFileName(name) {
   const value = String(name || '');
   const max = Number(window.fileNameMaxLength);
-  if (!Number.isFinite(max) || max <= 0 || value.length <= max) return value;
+  if (!Number.isFinite(max) || max <= 0) return value;
+
+  // By code point, so an astral character is never sliced into a lone surrogate (the
+  // server's `truncateFileName` does the same).
+  const chars = Array.from(value);
+  if (chars.length <= max) return value;
 
   const dot = value.lastIndexOf('.');
   const ext = dot > 0 ? value.slice(dot) : '';
   const stem = dot > 0 ? value.slice(0, dot) : value;
-  const room = Math.max(1, max - ext.length - 1);
-  return `${stem.slice(0, room)}…${ext}`;
+  const extChars = Array.from(ext);
+  const room = Math.max(1, max - extChars.length - 1);
+  return `${Array.from(stem).slice(0, room).join('')}…${ext}`;
 }
 
 function handleFilesUpload(files) {
