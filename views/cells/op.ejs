@@ -31,7 +31,11 @@ var controls = modView || locals.modControls;
   <%- include('../partials/time', { date: thread.creation }) %> 
   <span class="post-num">
     <a class="linkQuote" title="Link to this post" href="<%= threadHref %>#<%= id %>">No.</a><a class="linkQuote" title="Reply to this post" href="<%= href %>#q<%= id %>"><%= id %></a>
-    <% if (!locals.isThread) { %> <span>[<a href="<%= href %>" class="reply-link">Reply</a>]</span><% } %>
+    <% if (!locals.isThread) { %> <span>[<a href="<%= href %>" class="reply-link">Reply</a>]</span><%#
+      The newest-replies view of the thread (`?last=`, `be/routes/read.js`). A thread
+      too short to be trimmed would only open as it does without the parameter, and an
+      archived thread's page does not trim at all, so neither gets the link. %>
+    <% if (!locals.isArchive && (thread.totalReplies || 0) > 50) { %> <span>[<a href="<%= href %>?last=50" class="reply-link last-posts-link" title="Only the 50 newest replies">Last 50 Posts</a>]</span><% } %><% } %>
   </span>
   <% if (controls) { %>
   <%- include('/mod/partials/post-links', { boardUri, thread, postId: id, isThread: true, post: thread, showIp, globalStaff }) %>
