@@ -241,7 +241,7 @@ var boardSections = [
             <% } %>
 
             <a href="/rules" style="display:block; margin-bottom: 10px;">
-                <img src="/items/buttons/rules.png" class="promo" alt="Rules">
+                <img src="/items/buttons/rules.webp" class="promo" alt="Rules" decoding="async">
             </a>
 
             <div class="box">
@@ -386,8 +386,16 @@ var boardSections = [
                 </div>
                 <div class="gallery">
                     <div class="scroll" id="scroller">
-                        <% (latestImages || []).slice(0, 24).forEach(function (image) { %>
-                        <a href="<%= postUrl(image) %>"><img decoding="async" src="<%= image.thumb %>" alt="Small thumbnail" loading="lazy"></a>
+                        <%# The strip shows about eight of these at a time (70px each) and the rest
+                            arrive as it is dragged. The ones on screen are the section's content,
+                            so they are fetched with the page at high priority - the same thing the
+                            active-thread previews above already do - while the ones off-screen stay
+                            lazy, so a page load does not pull all 24 pictures. With `loading="lazy"`
+                            on every one of them they were the last thing in the queue: the page's
+                            own background and badges finished first and the strip was still empty
+                            seconds after the thread previews had appeared. %>
+                        <% (latestImages || []).slice(0, 24).forEach(function (image, i) { %>
+                        <a href="<%= postUrl(image) %>"><img decoding="async" src="<%= image.thumb %>" alt="Small thumbnail"<% if (i < 8) { %> fetchpriority="high"<% } else { %> loading="lazy"<% } %>></a>
                         <% }); %>
                     </div>
                 </div>
@@ -464,12 +472,15 @@ var boardSections = [
     <div class="partners">
         <div class="ptitle">Partners</div>
         <div class="badges">
-            <a href="https://mvcdb.miraheze.org/"><img src="/items/buttons/MVCDB.png" alt="MVCDB"></a>
-            <a href="https://endchan.org/miku/"><img src="/items/buttons/slashmiku.png" alt="slashmiku"></a>
-            <a href="https://hikari3.ch/"><img src="/items/buttons/hikari3.gif" alt="hikari3"></a>
-            <a href="https://holotower.org/"><img src="/items/buttons/hlt.png" alt="hlt"></a>
-            <a href="https://kissu.moe/"><img src="/items/buttons/kissu.gif" alt="kissu"></a>
-            <a href="https://wapchan.org/"><img src="/items/buttons/wapchan.gif" alt="wapchan"></a>
+            <a href="https://mvcdb.miraheze.org/"><img src="/items/buttons/MVCDB.png" alt="MVCDB" loading="lazy" decoding="async"></a>
+            <a href="https://endchan.org/miku/"><img src="/items/buttons/slashmiku.png" alt="slashmiku" loading="lazy" decoding="async"></a>
+            <%# 833 KB of animated GIF between the two biggest of these, at the very bottom of
+                the page: fetched when the reader gets there, never during a page load, and
+                the same animation is 256 KB as animated WebP. %>
+            <a href="https://hikari3.ch/"><img src="/items/buttons/hikari3.webp" alt="hikari3" width="88" height="31" loading="lazy" decoding="async"></a>
+            <a href="https://holotower.org/"><img src="/items/buttons/hlt.png" alt="hlt" loading="lazy" decoding="async"></a>
+            <a href="https://kissu.moe/"><img src="/items/buttons/kissu.gif" alt="kissu" loading="lazy" decoding="async"></a>
+            <a href="https://wapchan.org/"><img src="/items/buttons/wapchan.gif" alt="wapchan" loading="lazy" decoding="async"></a>
         </div>
         <div class="apply">
             Want to apply for a space here? <a href="/meta/thread/416">Read this thread</a>.
