@@ -307,7 +307,7 @@ var boardSections = [
                             <span class="star">&#9733;</span>
                         </div>
                         <div class="meta">
-                            <div class="ftitle"><%= thread.title || 'No subject' %></div>
+                            <div class="ftitle"><%= unescapeHtml(thread.title) || 'No subject' %></div>
                             <div class="fboard"><%= thread.boardName || thread.boardUri %></div>
                         </div>
                     </a>
@@ -339,7 +339,7 @@ var boardSections = [
                         </div>
                         <div class="recent">
                             <div class="time"><img src="/items/icons/notif.png" alt="icon"> <% var ltTs = boardBump(b.uri); %><% if (ltTs) { %><span class="board-time" data-ts="<%= ltTs %>"><%= boardTimeLabel(ltTs) %></span><% } else { %>No posts yet<% } %></div>
-                            <div class="topic">In: <% if (lt) { %><a href="/<%= b.uri %>/thread/<%= lt.threadId %>"><%= lt.subject || postSnippet(lt.message, 30) || 'No subject' %></a><% } else { %>&mdash;<% } %></div>
+                            <div class="topic">In: <% if (lt) { %><a href="/<%= b.uri %>/thread/<%= lt.threadId %>"><%= unescapeHtml(lt.subject || postSnippet(lt.message, 30)) || 'No subject' %></a><% } else { %>&mdash;<% } %></div>
                         </div>
                         <div class="chan-board-icon"><img src="/items/icons/<%= b.icon %>" alt="Icon"></div>
                     </div>
@@ -371,7 +371,7 @@ var boardSections = [
                                     card is one anchor, so a post that contains a link would close
                                     that anchor early and the browser would drop the rest of the
                                     card - this very div - outside it. %>
-                                <div class="ttitle"><%= thread.subject || postSnippet(thread.markdown || thread.message, 100) || 'No subject' %></div>
+                                <div class="ttitle"><%= unescapeHtml(thread.subject || postSnippet(thread.markdown || thread.message, 100)) || 'No subject' %></div>
                                 <div class="tmeta"><%= thread.postCount %> replies &bull; <span class="relative-time" data-ts="<%= new Date(thread.lastBump).getTime() %>"><%= activeTimeLabel(new Date(thread.lastBump).getTime()) %></span></div>
                             </div>
                         </a>
