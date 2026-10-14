@@ -33,7 +33,7 @@
       </summary>
       <div class="image-container">
         <a href="<%= post.files[0].path %>" class="media-toggle" data-mime="<%= post.files[0].mime || '' %>">
-          <img src="<%= post.files[0].thumb %>" alt="<%= post.files[0].originalName %>" class="thread-image" data-full="<%= post.files[0].path %>" data-thumb="<%= post.files[0].thumb %>">
+          <img loading="lazy" decoding="async" src="<%= post.files[0].thumb %>" alt="<%= post.files[0].originalName %>" class="thread-image" data-full="<%= post.files[0].path %>" data-thumb="<%= post.files[0].thumb %>">
         </a>
       </div>
     </details>
@@ -57,7 +57,7 @@
         </summary>
         <div class="image-container">
           <a href="<%= file.path %>" class="media-toggle" data-mime="<%= file.mime || '' %>">
-            <img src="<%= file.thumb %>" alt="<%= file.originalName %>" class="reply-image" data-full="<%= file.path %>" data-thumb="<%= file.thumb %>">
+            <img loading="lazy" decoding="async" src="<%= file.thumb %>" alt="<%= file.originalName %>" class="reply-image" data-full="<%= file.path %>" data-thumb="<%= file.thumb %>">
           </a>
         </div>
       </details>

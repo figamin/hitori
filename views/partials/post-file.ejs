@@ -15,23 +15,23 @@
     <a target="_blank" href="<%= file.path %>" class="file-link" title="<%= file.originalName %>"><%= locals.displayFileName ? locals.displayFileName(file.originalName) : file.originalName %></a>
     - <%= (file.size / 1024).toFixed(2) %> KB
     <% if (file.width && file.height) { %>(<%= file.width %>x<%= file.height %>)<% } %>
-    <a href="<%= file.path %>" download="<%= file.originalName %>" title="Download"><img src="/img/download.png" width="16" alt="Download"></a>
+    <a href="<%= file.path %>" download="<%= file.originalName %>" title="Download"><img src="/img/download.png" width="16" alt="Download" loading="lazy" decoding="async"></a>
     <% if (file.mime === 'tegaki/replay') { %>
     <a href="<%= file.path %>" class="replay-tegaki" download="<%= file.originalName %>">Replay</a>
     <% } else if (matchingReplay) { %>
     <a href="<%= matchingReplay.path %>" class="replay-tegaki" download="<%= matchingReplay.originalName %>">Replay</a>
     <% } %>
     <% if (file.mime !== 'tegaki/replay') { %>
-    <a target="_blank" style="text-decoration: underline;" title="SauceNAO" href="https://saucenao.com/search.php?url=<%= encodeURIComponent(fileUrl) %>"><img src="/img/saucenao.png" width="16" alt="SauceNAO"></a>
-    <a target="_blank" style="text-decoration: underline;" title="IQDB" href="https://iqdb.org/?url=<%= encodeURIComponent(fileUrl) %>"><img src="/img/iqdb.jpg" width="16" alt="IQDB"></a>
-    <a target="_blank" style="text-decoration: underline;" title="Yandex" href="https://yandex.com/images/search?rpt=imageview&url=<%= encodeURIComponent(fileUrl) %>"><img src="/img/yandex.png" width="16" alt="Yandex"></a>
+    <a target="_blank" style="text-decoration: underline;" title="SauceNAO" href="https://saucenao.com/search.php?url=<%= encodeURIComponent(fileUrl) %>"><img src="/img/saucenao.png" width="16" alt="SauceNAO" loading="lazy" decoding="async"></a>
+    <a target="_blank" style="text-decoration: underline;" title="IQDB" href="https://iqdb.org/?url=<%= encodeURIComponent(fileUrl) %>"><img src="/img/iqdb.jpg" width="16" alt="IQDB" loading="lazy" decoding="async"></a>
+    <a target="_blank" style="text-decoration: underline;" title="Yandex" href="https://yandex.com/images/search?rpt=imageview&url=<%= encodeURIComponent(fileUrl) %>"><img src="/img/yandex.png" width="16" alt="Yandex" loading="lazy" decoding="async"></a>
     <% } %>
       <% if (modControls) { %><%- include('/mod/partials/file-actions', { boardUri, threadId, postId, fileIndex }) %><% } %>
     <% } else { %>
     <a target="_blank" href="<%= file.path %>" class="file-link"><%= file.path %></a>
     <% var embedIcon = EMBED_ICONS[file.mime]; %>
     <% if (embedIcon) { %>
-    <a target="_blank" style="text-decoration: underline;" title="<%= embedIcon.label %>" href="<%= file.path %>"><img src="<%= embedIcon.icon %>" width="16" alt="<%= embedIcon.label %>"></a>
+    <a target="_blank" style="text-decoration: underline;" title="<%= embedIcon.label %>" href="<%= file.path %>"><img src="<%= embedIcon.icon %>" width="16" alt="<%= embedIcon.label %>" loading="lazy" decoding="async"></a>
     <% } %>
     <% if (file.mime === 'cytube/stream') { %>
     <span class="cytube-now-playing" title="This is a CyTube room, not a video: the player follows whatever the room is showing"><%= file.originalName %></span>
@@ -42,7 +42,7 @@
   <% if (file.mime !== 'tegaki/replay') { %>
   <div class="image-container">
     <a href="<%= file.path %>" class="media-toggle" data-mime="<%= file.mime %>"<% if (file.width && file.height) { %> data-file-width="<%= file.width %>" data-file-height="<%= file.height %>"<% } %>>
-      <img loading="lazy" src="<%= file.thumb %>" alt="<%= file.originalName %>" class="<%= imgClass %>" data-full="<%= file.path %>" data-thumb="<%= file.thumb %>"<% if (dw && dh) { %> width="<%= dw %>" height="<%= dh %>"<% } else if (isEmbed) { %> width="<%= maxW %>"<% } %>>
+      <img loading="lazy" decoding="async" src="<%= file.thumb %>" alt="<%= file.originalName %>" class="<%= imgClass %>" data-full="<%= file.path %>" data-thumb="<%= file.thumb %>"<% if (dw && dh) { %> width="<%= dw %>" height="<%= dh %>"<% } else if (isEmbed) { %> width="<%= maxW %>"<% } %>>
     </a>
   </div>
   <% } %>

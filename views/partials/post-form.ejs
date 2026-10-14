@@ -110,23 +110,27 @@
             <td class="postform-input-cell">
                 <details id="emo" class="emoclass">
                     <summary>Show Emotes</summary>
-                    <img src="/static/emotes/mikuwelcome.gif" title="mikuwelcome" alt="mikuwelcome" class="emote" height="45">
-                    <img src="/static/emotes/mikuhappy.gif" title="mikuhappy" alt="mikuhappy" class="emote" height="45">
-                    <img src="/static/emotes/rinthumbs.gif" title="rinthumbs" alt="rinthumbs" class="emote" height="45">
-                    <img src="/static/emotes/rinheart.gif" title="rinheart" alt="rinheart" class="emote" height="45">
-                    <img src="/static/emotes/lenno.gif" title="lenno" alt="lenno" class="emote" height="45">
-                    <img src="/static/emotes/lensorry.gif" title="lensorry" alt="lensorry" class="emote" height="45">
-                    <img src="/static/emotes/lenthumbs.gif" title="lenthumbs" alt="lenthumbs" class="emote" height="45">
-                    <img src="/static/emotes/lenshock.gif" title="lenshock" alt="lenshock" class="emote" height="45">
-                    <img src="/static/emotes/lukaclap.gif" title="lukaclap" alt="lukaclap" class="emote" height="45">
-                    <img src="/static/emotes/lukasparkle.gif" title="lukasparkle" alt="lukasparkle" class="emote" height="45">
-                    <img src="/static/emotes/kaitocheer.gif" title="kaitocheer" alt="kaitocheer" class="emote" height="45">
-                    <img src="/static/emotes/kaitolick.gif" title="kaitolick" alt="kaitolick" class="emote" height="45">
-                    <img src="/static/emotes/meikolol.gif" title="meikolol" alt="meikolol" class="emote" height="45">
-                    <img src="/static/emotes/meikojoy.gif" title="meikojoy" alt="meikojoy" class="emote" height="45">
-                    <img src="/static/emotes/meikoangry.gif" title="meikoangry" alt="meikoangry" class="emote" height="45">
-                    <img src="/static/emotes/lukaspin.gif" title="lukaspin" alt="lukaspin" class="emote" height="45">
-                    <img src="/static/emotes/yukarietto.gif" title="yukarietto" alt="yukarietto" class="emote" height="45">
+                    <%# Lazy so the ~17 emote GIFs (300 KB+) stay out of the initial load: %>
+                    <%# they live behind <details>, and the browser skips a lazy image with %>
+                    <%# no layout box until the picker is opened. `decoding="async"` keeps %>
+                    <%# them off the main thread when they do arrive. %>
+                    <img src="/static/emotes/mikuwelcome.gif" title="mikuwelcome" alt="mikuwelcome" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/mikuhappy.gif" title="mikuhappy" alt="mikuhappy" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/rinthumbs.gif" title="rinthumbs" alt="rinthumbs" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/rinheart.gif" title="rinheart" alt="rinheart" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/lenno.gif" title="lenno" alt="lenno" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/lensorry.gif" title="lensorry" alt="lensorry" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/lenthumbs.gif" title="lenthumbs" alt="lenthumbs" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/lenshock.gif" title="lenshock" alt="lenshock" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/lukaclap.gif" title="lukaclap" alt="lukaclap" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/lukasparkle.gif" title="lukasparkle" alt="lukasparkle" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/kaitocheer.gif" title="kaitocheer" alt="kaitocheer" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/kaitolick.gif" title="kaitolick" alt="kaitolick" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/meikolol.gif" title="meikolol" alt="meikolol" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/meikojoy.gif" title="meikojoy" alt="meikojoy" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/meikoangry.gif" title="meikoangry" alt="meikoangry" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/lukaspin.gif" title="lukaspin" alt="lukaspin" class="emote" height="45" loading="lazy" decoding="async">
+                    <img src="/static/emotes/yukarietto.gif" title="yukarietto" alt="yukarietto" class="emote" height="45" loading="lazy" decoding="async">
                 </details>
             </td>
         </tr>

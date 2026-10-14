@@ -303,7 +303,7 @@ var boardSections = [
                     <% featured.slice(0, 4).forEach(function (thread) { %>
                     <a href="/<%= thread.boardUri %>/thread/<%= thread.threadId %>" class="item">
                         <div class="fthumb">
-                            <% if (thread.thumb) { %><img src="<%= thread.thumb %>" alt="Thread thumbnail" loading="lazy"><% } %>
+                            <% if (thread.thumb) { %><img decoding="async" src="<%= thread.thumb %>" alt="Thread thumbnail" loading="lazy"><% } %>
                             <span class="star">&#9733;</span>
                         </div>
                         <div class="meta">
@@ -387,7 +387,7 @@ var boardSections = [
                 <div class="gallery">
                     <div class="scroll" id="scroller">
                         <% (latestImages || []).slice(0, 24).forEach(function (image) { %>
-                        <a href="<%= postUrl(image) %>"><img src="<%= image.thumb %>" alt="Small thumbnail" loading="lazy"></a>
+                        <a href="<%= postUrl(image) %>"><img decoding="async" src="<%= image.thumb %>" alt="Small thumbnail" loading="lazy"></a>
                         <% }); %>
                     </div>
                 </div>
@@ -505,7 +505,7 @@ var boardSections = [
     </footer>
 
     <script src="/frontpage.js"></script>
-    <script src="/verify.js"></script>
+    <script src="/verify.js?v=<%= locals.assetVersion('verify.js') %>"></script>
 
 </body>
 </html>
