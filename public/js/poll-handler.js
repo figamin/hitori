@@ -77,7 +77,8 @@ document.addEventListener('click', async function (event) {
       data = {};
     }
     if (response.ok && data.success) {
-      location.reload(); 
+      const refreshed = await renderPollCell(container, data.poll);
+      if (!refreshed) location.reload();
     } else {
       alert(data.error || `Vote failed (HTTP ${response.status})`);
     }
@@ -88,4 +89,24 @@ document.addEventListener('click', async function (event) {
     voteButton.disabled = false;
   }
 });
+
+async function renderPollCell(container, poll) {
+  if (!poll || !Array.isArray(poll.options)) return false;
+  try {
+    const response = await fetch(`/cells/poll?poll=${encodeURIComponent(JSON.stringify(poll))}`, {
+      headers: csrfHeaders({ Accept: 'text/html' })
+    });
+    if (!response.ok) return false;
+
+    const html = (await response.text()).trim();
+    const holder = container.closest('.poll-wrapper');
+    if (!holder || !html.startsWith('<div class="poll-wrapper"')) return false;
+
+    holder.outerHTML = html;
+    return true;
+  } catch (error) {
+    console.error('Poll refresh error:', error);
+    return false;
+  }
+}
 
