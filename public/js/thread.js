@@ -528,7 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('You are banned from posting.');
               }
             } else {
-              const errorMsg = result.error.message || result.error || result.message || 'Unknown error';
+              const errorMsg = result.error.message || result.message || result.error || 'Unknown error';
               alert(errorMsg);
             }
           }

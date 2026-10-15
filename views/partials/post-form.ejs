@@ -28,6 +28,12 @@
 
 </style>
     
+<%# A text board takes no uploads (`models/forms/makeThread.js` refuses a file on one), so its
+    forms include this partial with `textBoard: true` (`partials/post-form-text.ejs`, and
+    `textthread.ejs` for the reply form): the attachment-type selector, the File/Embed row, the
+    Tegaki button and the file rules stay out, and the poll editor - which has no other way to
+    be opened on such a board - is shown instead of hidden. %>
+<% const textBoard = locals.textBoard === true; %>
 <table id="postformTable">
     <tbody>
         <tr>
@@ -80,7 +86,7 @@
                 <% var tegakiOk = locals.tegakiAllowed !== false; %>
                 <div class="js-only comment-block-extra">
                     <% if (pollsOk) { %>
-                    <div id="poll-details" class="poll-details" style="display: none; padding: 10px;">
+                    <div id="poll-details" class="poll-details" style="display: <%= textBoard ? 'block' : 'none' %>; padding: 10px;">
                         <input type="text" autocomplete="off" name="poll_question" placeholder="Poll question" style="width: 98%; margin-bottom: 5px;" />
                         <div id="poll-options" data-max-options="<%= locals.maxPollOptions || 10 %>">
                             <input type="text" autocomplete="off" name="poll_options[]" placeholder="Option 1" style="width: 90%; margin-bottom: 5px;" />
@@ -99,7 +105,7 @@
                         </div>
                     </div>
                     <% } %>
-                    <% if (tegakiOk) { %>
+                    <% if (tegakiOk && !textBoard) { %>
                     <button type="button" id="tegaki-btn" title="Tegaki" class="form-button" style="display: none;">Tegaki</button>
                     <% } %>
                 </div>
@@ -134,7 +140,7 @@
                 </details>
             </td>
         </tr>
-        <% if (youtubeOk || pollsOk || tegakiOk) { %>
+        <% if (!textBoard && (youtubeOk || pollsOk || tegakiOk)) { %>
         <%
       var modeOptions = [{ mode: 'file', label: 'File' }];
       if (youtubeOk) modeOptions.push({ mode: 'youtube', label: 'Embed' });
@@ -153,6 +159,7 @@
             </td>
         </tr>
         <% } %>
+        <% if (!textBoard) { %>
         <tr>
             <td class="post-block"><label id="file-row-label" for="standard-image">File</label></td>
             <td class="postform-input-cell">
@@ -173,6 +180,7 @@
                 <% } %>
             </td>
         </tr>
+        <% } %>
 <% if (locals.captcha && (locals.captcha.required || locals.captcha.solved)) { %>
         <tr class="captcha-row">
             <td class="post-block"><label>Captcha</label></td>
@@ -189,10 +197,14 @@
             <td colspan="2" class="rules">
                 <ul style="margin-left: 0; margin-top: 0; margin-bottom: 0;">
                     <li>Please read the <a href="/rules">Rules</a> and <a href="/faq">FAQ</a> before posting.</li>
+                    <% if (!textBoard) { %>
                     <li>Supported file types are: GIF, JPG, OGG, MP3, MP4, PNG, SWF, WEBM, WEBP.</li>
+                    <% } %>
                     <li>Supported embeds are: YouTube, Nicovideo, Twitter/X, Bluesky, BiliBili, Vocaroo.</li>
+                    <% if (!textBoard) { %>
                     <li>Maximum file size allowed is 20MB.</li>
                     <li>Images greater than 250x250 pixels will be thumbnailed.</li>
+                    <% } %>
                 </ul>
 
             </td>
@@ -250,11 +262,11 @@
 
 </script>
 
-<% if (tegakiOk) { %>
+<% if (tegakiOk && !textBoard) { %>
 <script src="/js/tegaki-post.js"></script>
 <% } %>
 
-<% if (youtubeOk || pollsOk || tegakiOk) { %>
+<% if (!textBoard && (youtubeOk || pollsOk || tegakiOk)) { %>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const modeButtons = document.querySelectorAll('.mode-select-btn');

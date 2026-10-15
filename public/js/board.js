@@ -172,7 +172,10 @@ document.addEventListener('DOMContentLoaded', function () {
               alert('You are banned from posting.');
             }
           } else {
-            alert(result.error || 'Error creating thread');
+            // The server's own wording when it sent one: the captcha gate answers with a code
+            // and a message (`{error: 'captcha', message: 'Solve the captcha before posting.'}`),
+            // and showing the bare code would be no help at all.
+            alert(result.message || result.error || 'Error creating thread');
           }
         } else if (!response.ok) {
           const errorText = await response.text();

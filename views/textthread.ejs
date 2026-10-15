@@ -1,4 +1,5 @@
 <% boardFooter = true; %>
+<% bodyClass = 'textboard'; %>
 <% title = '/' + boardUri + '/ - ' + (thread.subject || thread.message); %>
 <% styles = ['/css/textboard.css', '/css/tegaki.css', 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/monokai-sublime.min.css']; %>
 <% if (modView) { %>
@@ -53,7 +54,10 @@
               method="POST"
               enctype="multipart/form-data"
               data-max-files="<%= maxUploadFiles %>">
-              <%- include('partials/post-form') %>
+              <%# A text board takes no uploads and no embeds field: the attachment rows stay
+                  out of the form (`textBoard`), and `isThread` makes it the reply form it is -
+                  sage and nonoko instead of a subject, "New reply" instead of "New thread". %>
+              <%- include('partials/post-form', { textBoard: true, isThread: true }) %>
             </form>
             <noscript>
               <a href="/styling">Styling</a>

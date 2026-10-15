@@ -1,6 +1,12 @@
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('image');
 const previewContainer = document.getElementById('preview-container');
+// The upload widget is optional: a text board's forms have no File row at all
+// (`views/partials/post-form.ejs` leaves it out when the include asked for `textBoard`), and
+// this script is loaded on those pages too. Everything that needs the widget checks this
+// first - without it the page's other scripts would never run, because the wiring below threw
+// on the missing elements.
+const uploadWidget = Boolean(dropZone && fileInput && previewContainer);
 const form =
   document.getElementById('post-form') ||
   document.getElementById('submit-form') ||
@@ -37,25 +43,28 @@ Object.defineProperty(window, 'currentFiles', {
   }
 });
 
-fileInput.removeAttribute('required');
-fileInput.setAttribute('multiple', 'true');
-fileInput.setAttribute('max', String(maxFilesLimit));
+if (uploadWidget) {
+  fileInput.removeAttribute('required');
+  fileInput.setAttribute('multiple', 'true');
+  fileInput.setAttribute('max', String(maxFilesLimit));
+}
 
-// Set up main drop zone
-dropZone.addEventListener('click', () => {
+// Set up main drop zone. `?.` because a text board's form has no drop zone to wire up (see
+// `uploadWidget`), and a guard per listener would be noisier than the one check above.
+dropZone?.addEventListener('click', () => {
   fileInput.click();
 });
 
-dropZone.addEventListener('dragover', (e) => {
+dropZone?.addEventListener('dragover', (e) => {
   e.preventDefault();
   dropZone.style.backgroundColor = 'var(--small-button)';
 });
 
-dropZone.addEventListener('dragleave', () => {
+dropZone?.addEventListener('dragleave', (e) => {
   dropZone.style.backgroundColor = 'var(--background-gradient)';
 });
 
-dropZone.addEventListener('drop', (e) => {
+dropZone?.addEventListener('drop', (e) => {
   e.preventDefault();
   dropZone.style.backgroundColor = 'var(--background-gradient)';
   const files = Array.from(e.dataTransfer.files);
@@ -65,7 +74,7 @@ dropZone.addEventListener('drop', (e) => {
 // Set up QR drop zone only if it exists
 if (dropZone_QR) {
   dropZone_QR.addEventListener('click', () => {
-    fileInput.click();
+    fileInput?.click();
   });
 
   dropZone_QR.addEventListener('dragover', (e) => {
@@ -85,41 +94,46 @@ if (dropZone_QR) {
   });
 }
 
-fileInput.addEventListener('change', (e) => {
-  const files = Array.from(e.target.files);
-  if (files.length === 0) return;
+if (uploadWidget) {
+  fileInput.addEventListener('change', (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
 
-  window.currentFiles = [];
-  const previewItems = previewContainer.querySelectorAll('.preview-item');
-  previewItems.forEach((item) => item.remove());
-  if (previewContainer_QR) {
-    const qrPreviews = previewContainer_QR.querySelectorAll('.preview-text');
-    qrPreviews.forEach((item) => item.remove());
-  }
-  handleFilesUpload(files);
-  updateFileInput();
-});
+    window.currentFiles = [];
+    const previewItems = previewContainer.querySelectorAll('.preview-item');
+    previewItems.forEach((item) => item.remove());
+    if (previewContainer_QR) {
+      const qrPreviews = previewContainer_QR.querySelectorAll('.preview-text');
+      qrPreviews.forEach((item) => item.remove());
+    }
+    handleFilesUpload(files);
+    updateFileInput();
+  });
+}
 
-document.addEventListener('paste', (e) => {
-  const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-  const files = [];
-  let hasFiles = false;
+// Without the widget there is nothing to paste into: the message goes in as typed.
+if (uploadWidget) {
+  document.addEventListener('paste', (e) => {
+    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    const files = [];
+    let hasFiles = false;
 
-  for (const item of items) {
-    if (item.kind === 'file') {
-      hasFiles = true;
-      const file = item.getAsFile();
-      if (file) {
-        files.push(file);
+    for (const item of items) {
+      if (item.kind === 'file') {
+        hasFiles = true;
+        const file = item.getAsFile();
+        if (file) {
+          files.push(file);
+        }
       }
     }
-  }
 
-  if (hasFiles) {
-    e.preventDefault();
-    handleFilesUpload(files);
-  }
-});
+    if (hasFiles) {
+      e.preventDefault();
+      handleFilesUpload(files);
+    }
+  });
+}
 
 function isTegakiReplayFile(file) {
   return file.type === 'tegaki/replay' || (file.name || '').toLowerCase().endsWith('.tgkr');
@@ -259,6 +273,7 @@ function handleFilesUpload(files) {
 }
 
 function updateFileInput() {
+  if (!uploadWidget) return;
   const dataTransfer = new DataTransfer();
   currentFiles.forEach((file) => dataTransfer.items.add(file));
   fileInput.files = dataTransfer.files;
@@ -308,7 +323,7 @@ if (form) {
     form.id !== 'quick-reply-form' &&
     form.getAttribute('data-requires-file') !== 'false';
 
-  if (!fileInput.files.length && requiresFile) {
+  if (uploadWidget && !fileInput.files.length && requiresFile) {
     e.preventDefault();
     alert('Please select at least one file before submitting.');
     return;

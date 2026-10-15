@@ -15,7 +15,7 @@
 <% }) %>
 <%- head %>
 </head>
-<body>
+<body<% if (locals.bodyClass) { %> class="<%= locals.bodyClass %>"<% } %>>
 <%- include('partials/header') %>
 <div class="container"><main class="content<%= mod ? ' mod-page' : '' %>">
 <% if (mod && locals.user && showNav) { %><%- include('mod/partials/nav') %><% } %>

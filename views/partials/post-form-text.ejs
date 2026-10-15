@@ -1,0 +1,14 @@
+<%#
+  The text board's posting form. `views/textboard.ejs` includes this name for its new-thread
+  form, and a text board takes no uploads (`models/forms/makeThread.js` refuses a file on one),
+  so it is the ordinary posting form with the attachment rows, the Tegaki button and the
+  file rules left out - see `textBoard` in `partials/post-form.ejs`. The poll editor stays, and
+  is shown rather than hidden behind the attachment-type selector that a text board has no use
+  for.
+
+  What marks the upload as optional is the <form> this is included in: it carries
+  `data-requires-file="false"`, which is what `public/js/upload.js` reads before insisting on a
+  file. (`#reply-form` is exempted there on its own, which is why the text thread's reply form
+  needs nothing but the `textBoard` flag.)
+%>
+<%- include('post-form', { textBoard: true }) %>

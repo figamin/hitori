@@ -469,7 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
               alert('You are banned from posting.');
             }
           } else {
-            alert(result.error.message || result.error || 'Error posting reply');
+            alert(result.error.message || result.message || result.error || 'Error posting reply');
           }
         }
       } else if (!response.ok) {
