@@ -36,11 +36,7 @@
     const items = [];
     document.querySelectorAll('.media-toggle').forEach((link) => {
       const mime = link.getAttribute('data-mime') || '';
-      // A browser that cannot decode JPEG XL gets no slide for one: the picture would
-      // be blank there, and the plain link still offers the file (`thumb.js` holds the
-      // test; a page without it treats the format as unshowable, which is the safe way
-      // round).
-      const isImage = mime.startsWith('image/') && (mime !== 'image/jxl' || (window.supportsJxl?.() ?? false));
+      const isImage = mime.startsWith('image/');
       const isVideo = mime.startsWith('video/');
       if (!isImage && !isVideo) return;
       const img = link.querySelector('img');
@@ -249,6 +245,16 @@
       el.controls = true;
       el.autoplay = true;
       el.addEventListener('click', (e) => e.stopPropagation());
+    } else {
+      // A browser with no decoder for the format (JPEG XL, in Chrome and Firefox) cannot
+      // show the original, and a failed image leaves the stage blank. The thumbnail is
+      // always a WebP the browser can read, so the slide falls back to it; the file
+      // itself stays one click away in the header's filename link.
+      el.addEventListener('error', () => {
+        if (el.dataset.fellBack) return;
+        el.dataset.fellBack = '1';
+        el.src = item.thumb;
+      });
     }
     return el;
   }

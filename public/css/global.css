@@ -628,6 +628,21 @@ input[type="text"] {
   max-width: 100%;
 }
 
+/* Stands in for a picture the browser could not decode at all (see `expandImage` in
+   `thumb.js`): an inline element that failed to load would just be blank. The link
+   inside it is underlined because this theme leaves links plain, and the reader has to
+   see that the file is one click away. */
+.img-unsupported {
+  display: inline-block;
+  padding: 2px 4px;
+  font-size: 0.85em;
+  opacity: 0.8;
+}
+
+.img-unsupported a {
+  text-decoration: underline;
+}
+
 .image-container {
   float: left;
   margin-left: 20px;

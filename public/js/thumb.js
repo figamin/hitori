@@ -39,27 +39,6 @@ function vocarooIdFrom(href) {
   return match ? match[1] : null;
 }
 
-// Whether this browser can decode JPEG XL at all - asked once per page, by making the
-// canvas name the format and seeing whether it keeps it. Chrome and Firefox answer no
-// today, Safari from 17 answers yes. The server has already made a WebP thumbnail
-// either way, so this only decides whether the full picture can be shown in place: a
-// reader whose browser cannot read one gets the plain link and its download.
-let jxlSupport;
-function supportsJxl() {
-  if (jxlSupport === undefined) {
-    try {
-      jxlSupport = document.createElement('canvas').toDataURL('image/jxl').startsWith('data:image/jxl');
-    } catch {
-      jxlSupport = false;
-    }
-  }
-  return jxlSupport;
-}
-
-function displayableImage(mime) {
-  return mime.startsWith('image/') && (mime !== 'image/jxl' || supportsJxl());
-}
-
 // Vocaroo's own player, asked not to autoplay - the form their embed code uses.
 // This is the fallback for a recording their CDN will not serve any more: without
 // it the block could only ever show a silent 0:00.
@@ -923,9 +902,33 @@ const thumbs = {
 
     if (thumb.src === link.href && mime !== 'image/svg+xml') return false;
 
+    // Showing the file in place is tried for every picture, whatever its format: a
+    // browser that cannot decode it (JPEG XL is one Chrome and Firefox have no decoder
+    // for, while Safari 17+ does) fires `error` instead of `load`, and the reader then
+    // gets the thumbnail back plus a line offering the file itself - rather than a
+    // blank element. Asking the browser up front is not an option: `canvas.toDataURL`
+    // tests whether it can *write* the format, which no browser can, so it answers no
+    // on Safari too.
+    parent.querySelector('.img-unsupported')?.remove();
     expanded = document.createElement('img');
     expanded.src = link.href;
     expanded.className = 'img-expanded';
+    expanded.addEventListener('error', () => {
+      expanded.remove();
+      thumb.style.display = '';
+      parent.classList.remove('expanded-cell');
+      const open = document.createElement('a');
+      open.href = link.href;
+      open.textContent = 'open the file';
+      // It goes beside the picture rather than inside the link to it: a link within a
+      // link is not valid, and a click on this one would otherwise be swallowed by the
+      // post's own handler (which prevents the default action).
+      open.addEventListener('click', (e) => e.stopPropagation());
+      const notice = document.createElement('span');
+      notice.className = 'img-unsupported';
+      notice.append("This browser can't show this picture - ", open);
+      parent.appendChild(notice);
+    });
     thumb.style.display = 'none';
     link.appendChild(expanded);
     return false;
@@ -1276,7 +1279,7 @@ const thumbs = {
 
   processImageLink(link) {
     const mime = link.getAttribute('data-mime') || '';
-    if (displayableImage(mime)) {
+    if (mime.startsWith('image/')) {
       link.addEventListener('click', (e) => {
         if (isModifiedClick(e)) return;
         e.preventDefault();
@@ -1397,7 +1400,7 @@ window.thumbs = thumbs;
     const link = img.closest('.media-toggle');
     if (!link) return null;
     const mime = link.getAttribute('data-mime') || '';
-    if (!displayableImage(mime)) return null;
+    if (!mime.startsWith('image/')) return null;
     const expanded = link.querySelector('.img-expanded');
     if (expanded && expanded.style.display !== 'none' && expanded.src) return null;
     const full = img.dataset.full || link.getAttribute('href');
@@ -1535,10 +1538,6 @@ window.thumbs = thumbs;
     }
   };
 })();
-
-// For the gallery, which is loaded separately (see `gallery.js`): it needs the same
-// answer to decide whether a JPEG XL belongs in its strip.
-window.supportsJxl = supportsJxl;
 
 function initThumbPage() {
   initializeThumbnails();
