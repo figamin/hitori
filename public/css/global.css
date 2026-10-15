@@ -4451,6 +4451,29 @@ html {
   opacity: .7;
 }
 
+#quickReply #quick-reply-form .qr-comment {
+  display: flex !important;
+  flex-direction: column !important;
+  position: static !important;
+}
+
+#quickReply #quick-reply-form .qr-comment .qr-textarea {
+  flex: 0 0 120px;
+  width: 100%;
+}
+
+#quickReply #quick-reply-form .qr-comment .qr-count {
+  position: static !important;
+  inset: auto !important;
+  display: block !important;
+  align-self: flex-end;
+  height: 12px;
+  line-height: 12px;
+  margin: 2px 2px 0 0;
+  padding: 0;
+  background: transparent;
+}
+
 /* ---------------------------------------------------------------------------
    Statistics chart palette.
 
