@@ -77,7 +77,7 @@
             chunk.map(({ post, position }) =>
               fetch(`/${board}/cells/reply`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: csrfHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({
                   reply: { ...post, sage: Boolean(post.sage) },
                   thread: { threadId, boardUri: board },

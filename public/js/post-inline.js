@@ -252,7 +252,9 @@
       try {
         const data = await postData(parts);
         if (!data) throw new Error('Post not found');
-        const res = await fetch('/cells/post-preview?post=' + encodeURIComponent(JSON.stringify(data)));
+        const res = await fetch('/cells/post-preview?post=' + encodeURIComponent(JSON.stringify(data)), {
+          headers: csrfHeaders()
+        });
         if (!res.ok) throw new Error('Post could not be rendered');
         box.innerHTML = await res.text();
         decorate(box);

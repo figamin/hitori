@@ -66,9 +66,9 @@ document.addEventListener('click', async function (event) {
   try {
     const response = await fetch('/api/poll/vote', {
       method: 'POST',
-      headers: {
+      headers: csrfHeaders({
         'Content-Type': 'application/json'
-      },
+      }),
       body: JSON.stringify({
         pollId,
         optionIndexes: selectedIndexes

@@ -53,7 +53,7 @@ window.initializeExpansion = function () {
 
               return fetch(`/${boardUri}/cells/reply`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: csrfHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({
                   reply,
                   thread: { threadId, boardUri },

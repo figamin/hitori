@@ -317,7 +317,7 @@ const threadAutoRefresh = {
 
     fetch(`/${this.boardUri}/cells/${cellPath}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: csrfHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({
         reply: { ...post, sage: Boolean(post.sage) },
         thread,

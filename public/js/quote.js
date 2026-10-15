@@ -273,7 +273,9 @@ const tooltips = {
   },
 
   renderPreview(postData, tooltip, quoteUrl) {
-    return fetch('/cells/post-preview?post=' + encodeURIComponent(JSON.stringify(postData)))
+    return fetch('/cells/post-preview?post=' + encodeURIComponent(JSON.stringify(postData)), {
+      headers: csrfHeaders()
+    })
       .then((r) => {
         if (!r.ok) throw new Error('Preview request failed');
         return r.text();

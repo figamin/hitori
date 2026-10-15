@@ -42,7 +42,7 @@ async function performSearch(query) {
 
     const listRes = await fetch(`/${boardUri}/cells/thread-list`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: csrfHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ threads: data.threads, boardUri, isOverboard: false })
     });
     threadsEl.innerHTML = await listRes.text();

@@ -742,9 +742,9 @@ async function deletePost(postId, password, isThread, boardUri) {
   try {
     const response = await fetch('/api/delete-post', {
       method: 'POST',
-      headers: {
+      headers: csrfHeaders({
         'Content-Type': 'application/json'
-      },
+      }),
       body: JSON.stringify({ postId, password, isThread, boardUri })
     });
 
@@ -838,9 +838,9 @@ async function submitReport(postId, boardUri, reason, category, isThread, modal)
   try {
     const response = await fetch('/api/report', {
       method: 'POST',
-      headers: {
+      headers: csrfHeaders({
         'Content-Type': 'application/json'
-      },
+      }),
       body: JSON.stringify({
         postId,
         boardUri,
