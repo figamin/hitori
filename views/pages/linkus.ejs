@@ -1,7 +1,4 @@
 <%
-    // Optional: pass `banners` or `currentPage` from your route to override these defaults.
-    // siteUrl is fixed (not the global res.locals.siteUrl, which follows the request host) so the
-    // embed snippets always point at production.
     const siteUrl = 'https://39chan.moe';
     const currentPage = locals.currentPage || 'linkus.html';
 
@@ -43,7 +40,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/frontpage.css">
     <style>
-        /* whatever works works ig */
         .wrap {
             grid-template-columns: 1fr !important;
             max-width: 750px !important;
@@ -313,7 +309,6 @@
     <script>
         document.querySelectorAll('.linkus-copy').forEach(function (btn) {
             btn.addEventListener('click', function () {
-                // getAttribute already returns the decoded string, so no manual entity replacement is needed
                 var text = btn.getAttribute('data-copy');
 
                 var done = function () {

@@ -1,6 +1,5 @@
-/*! tegaki.js, MIT License */ 'use strict';
+ 'use strict';
 var TegakiStrings = {
-  // Messages
   badDimensions: 'Invalid dimensions.',
   promptWidth: 'Canvas width in pixels',
   promptHeight: 'Canvas height in pixels',
@@ -13,7 +12,6 @@ var TegakiStrings = {
   confirmCancel: 'Are you sure? Your work will be lost.',
   confirmChangeCanvas: 'Are you sure? Changing the canvas will clear all layers and history and disable replay recording.',
 
-  // Controls
   color: 'Color',
   size: 'Size',
   alpha: 'Opacity',
@@ -23,7 +21,6 @@ var TegakiStrings = {
   switchPalette: 'Switch color palette',
   paletteSlotReplace: 'Right click to replace with the current color',
 
-  // Layers
   layer: 'Layer',
   addLayer: 'Add layer',
   delLayers: 'Delete layers',
@@ -32,7 +29,6 @@ var TegakiStrings = {
   moveLayerDown: 'Move down',
   toggleVisibility: 'Toggle visibility',
 
-  // Menu bar
   newCanvas: 'New',
   open: 'Open',
   save: 'Save',
@@ -43,12 +39,10 @@ var TegakiStrings = {
   close: 'Close',
   finish: 'Finish',
 
-  // Tool modes
   tip: 'Tip',
   pressure: 'Pressure',
   preserveAlpha: 'Preserve Alpha',
 
-  // Tools
   pen: 'Pen',
   pencil: 'Pencil',
   airbrush: 'Airbrush',
@@ -58,7 +52,6 @@ var TegakiStrings = {
   bucket: 'Bucket',
   tone: 'Tone',
 
-  // Replay
   gapless: 'Gapless',
   play: 'Play',
   pause: 'Pause',
@@ -1010,7 +1003,6 @@ class TegakiBucket extends TegakiTool {
 
     this.fill(Tegaki.activeLayer.imageData, x, y, this.rgb, this.alpha);
 
-    // TODO: write back only the tainted rect
     Tegaki.activeLayer.ctx.putImageData(Tegaki.activeLayer.imageData, 0, 0);
   }
 
@@ -2018,7 +2010,6 @@ var TegakiHistoryActions = {
   }
 };
 
-// ---
 
 TegakiHistoryActions.Draw.prototype.addCanvasState = function (imageData, type) {
   if (type) {
@@ -3990,12 +3981,10 @@ var Tegaki = {
     }
 
     if (e.mozInputSource !== undefined) {
-      // Firefox thing where mouse events fire for no reason when the pointer is a pen
       if (Tegaki.activePointerIsPen && e.pointerType === 'mouse') {
         return;
       }
     } else {
-      // Webkit thing where a pointermove event is fired at pointerdown location after a pointerup
       if (Tegaki.activePointerId !== e.pointerId) {
         Tegaki.activePointerId = e.pointerId;
         return;
@@ -4269,7 +4258,6 @@ class TegakiEvent_c {
   }
 }
 
-// ---
 
 class TegakiEventPrelude extends TegakiEvent_void {
   constructor(timeStamp) {
@@ -4280,7 +4268,7 @@ class TegakiEventPrelude extends TegakiEvent_void {
 
   static unpack(r) {
     return super.unpack(r);
-  } // FF bug 1628719
+  } 
 
   dispatch() {}
 }
@@ -4294,7 +4282,7 @@ class TegakiEventConclusion extends TegakiEvent_void {
 
   static unpack(r) {
     return super.unpack(r);
-  } // FF bug 1628719
+  } 
 
   dispatch() {}
 }
@@ -4308,7 +4296,7 @@ class TegakiEventHistoryDummy extends TegakiEvent_void {
 
   static unpack(r) {
     return super.unpack(r);
-  } // FF bug 1628719
+  } 
 
   dispatch() {
     TegakiHistory.push(new TegakiHistoryActions.Dummy());
@@ -4468,7 +4456,7 @@ class TegakiEventDrawCommit extends TegakiEvent_void {
 
   static unpack(r) {
     return super.unpack(r);
-  } // FF bug 1628719
+  } 
 
   dispatch() {
     Tegaki.tool.commit();
@@ -4488,7 +4476,7 @@ class TegakiEventUndo extends TegakiEvent_void {
 
   static unpack(r) {
     return super.unpack(r);
-  } // FF bug 1628719
+  } 
 
   dispatch() {
     TegakiHistory.undo();
@@ -4504,7 +4492,7 @@ class TegakiEventRedo extends TegakiEvent_void {
 
   static unpack(r) {
     return super.unpack(r);
-  } // FF bug 1628719
+  } 
 
   dispatch() {
     TegakiHistory.redo();
@@ -4698,7 +4686,7 @@ class TegakiEventAddLayer extends TegakiEvent_void {
 
   static unpack(r) {
     return super.unpack(r);
-  } // FF bug 1628719
+  } 
 
   dispatch() {
     Tegaki.addLayer();
@@ -4714,7 +4702,7 @@ class TegakiEventDeleteLayers extends TegakiEvent_void {
 
   static unpack(r) {
     return super.unpack(r);
-  } // FF bug 1628719
+  } 
 
   dispatch() {
     Tegaki.deleteSelectedLayers();
@@ -4743,7 +4731,7 @@ class TegakiEventMergeLayers extends TegakiEvent_void {
 
   static unpack(r) {
     return super.unpack(r);
-  } // FF bug 1628719
+  } 
 
   dispatch() {
     Tegaki.mergeSelectedLayers();
@@ -5064,7 +5052,6 @@ class TegakiReplayRecorder {
     this.writeEventStack(w);
 
     compData = this.compressData(w);
-    //compData = new Uint8Array(data.slice(0));
 
     w = new TegakiBinWriter(new ArrayBuffer(headerSize + compData.length));
 
@@ -5542,15 +5529,9 @@ var TegakiUI = {
   buildUI: function () {
     var bg, cnt, el, ctrl, layersCnt, canvasCnt;
 
-    //
-    // Grid container
-    //
     bg = $T.el('div');
     bg.id = 'tegaki';
 
-    //
-    // Menu area
-    //
     el = $T.el('div');
     el.id = 'tegaki-menu-cnt';
 
@@ -5567,9 +5548,6 @@ var TegakiUI = {
 
     bg.appendChild(TegakiUI.buildDummyFilePicker());
 
-    //
-    // Tools area
-    //
     cnt = $T.el('div');
     cnt.id = 'tegaki-tools-cnt';
 
@@ -5577,44 +5555,28 @@ var TegakiUI = {
 
     bg.appendChild(cnt);
 
-    //
-    // Canvas area
-    //
     [canvasCnt, layersCnt] = TegakiUI.buildCanvasCnt();
 
     bg.appendChild(canvasCnt);
 
-    //
-    // Controls area
-    //
     ctrl = $T.el('div');
     ctrl.id = 'tegaki-ctrl-cnt';
 
-    // Zoom control
     ctrl.appendChild(TegakiUI.buildZoomCtrlGroup());
 
-    // Colorpicker
     ctrl.appendChild(TegakiUI.buildColorCtrlGroup(Tegaki.toolColor));
 
-    // Size control
     ctrl.appendChild(TegakiUI.buildSizeCtrlGroup());
 
-    // Alpha control
     ctrl.appendChild(TegakiUI.buildAlphaCtrlGroup());
 
-    // Flow control
     ctrl.appendChild(TegakiUI.buildFlowCtrlGroup());
 
-    // Layers control
     ctrl.appendChild(TegakiUI.buildLayersCtrlGroup());
 
-    // ---
 
     bg.appendChild(ctrl);
 
-    //
-    // Status area
-    //
     bg.appendChild(TegakiUI.buildStatusCnt());
 
     return [bg, canvasCnt, layersCnt];
@@ -5714,7 +5676,6 @@ var TegakiUI = {
       cnt.classList.add('tegaki-hidden');
     }
 
-    // Dynamics
     grp = $T.el('span');
     grp.id = 'tegaki-tool-mode-dynamics';
     grp.className = 'tegaki-toolmode-grp';
@@ -5753,7 +5714,6 @@ var TegakiUI = {
 
     cnt.appendChild(grp);
 
-    // Preserve Alpha
     grp = $T.el('span');
     grp.id = 'tegaki-tool-mode-mask';
     grp.className = 'tegaki-toolmode-grp';
@@ -5773,7 +5733,6 @@ var TegakiUI = {
 
     cnt.appendChild(grp);
 
-    // Tip
     grp = $T.el('span');
     grp.id = 'tegaki-tool-mode-tip';
     grp.className = 'tegaki-toolmode-grp';
@@ -5865,11 +5824,9 @@ var TegakiUI = {
 
     ctrl = this.buildCtrlGroup('layers', TegakiStrings.layers);
 
-    // Layer options row
     row = $T.el('div');
     row.id = 'tegaki-layers-opts';
 
-    // Alpha
     cnt = $T.el('div');
     cnt.id = 'tegaki-layer-alpha-cell';
 
@@ -6260,7 +6217,6 @@ var TegakiUI = {
     $T.on(cnt, 'dragleave', TegakiUI.onLayerDragLeave);
     $T.on(cnt, 'dragexit', TegakiUI.onLayerDragLeave);
 
-    // visibility toggle
     cell = $T.el('div');
     cell.className = 'tegaki-layers-cell-v';
 
@@ -6278,7 +6234,6 @@ var TegakiUI = {
     cell.appendChild(el);
     cnt.appendChild(cell);
 
-    // preview
     cell = $T.el('div');
     cell.className = 'tegaki-layers-cell-p';
 
@@ -6290,7 +6245,6 @@ var TegakiUI = {
     cell.appendChild(el);
     cnt.appendChild(cell);
 
-    // name
     cell = $T.el('div');
     cell.className = 'tegaki-layers-cell-n';
 
@@ -6307,7 +6261,6 @@ var TegakiUI = {
     return cnt;
   },
 
-  // ---
 
   onLayerSelectorPtrDown: function (e) {
     if (e.pointerType === 'mouse') {
@@ -6484,13 +6437,11 @@ var TegakiUI = {
     return true;
   },
 
-  // ---
 
   setReplayMode: function (flag) {
     Tegaki.bg.classList[flag ? 'add' : 'remove']('tegaki-replay-mode');
   },
 
-  // ---
 
   onToolChanged: function () {
     $T.id('tegaki-toolmode-bar').classList.remove('tegaki-hidden');
@@ -6500,7 +6451,6 @@ var TegakiUI = {
     TegakiUI.updateToolModes();
   },
 
-  // ---
 
   updateLayerAlphaOpt: function () {
     var el = $T.id('tegaki-layer-alpha-opt');
@@ -7026,7 +6976,6 @@ var TegakiUI = {
     }
   }
 };
-/*! UZIP.js, © 2018 Photopea, MIT License */
 
 var UZIP = {};
 if (typeof module == 'object') module.exports = UZIP;
@@ -7131,24 +7080,18 @@ UZIP.F = {};
 
 UZIP.F.deflateRaw = function (data, out, opos, lvl) {
   var opts = [
-    /*
-		 ush good_length; /* reduce lazy search above this match length 
-		 ush max_lazy;    /* do not perform lazy search above this match length 
-         ush nice_length; /* quit search above this match length 
-	*/
-    /*      good lazy nice chain */
-    /* 0 */ [0, 0, 0, 0, 0] /* store only */,
-    /* 1 */ [4, 4, 8, 4, 0] /* max speed, no lazy matches */,
-    /* 2 */ [4, 5, 16, 8, 0],
-    /* 3 */ [4, 6, 16, 16, 0],
+     [0, 0, 0, 0, 0] ,
+     [4, 4, 8, 4, 0] ,
+     [4, 5, 16, 8, 0],
+     [4, 6, 16, 16, 0],
 
-    /* 4 */ [4, 10, 16, 32, 0] /* lazy matches */,
-    /* 5 */ [8, 16, 32, 32, 0],
-    /* 6 */ [8, 16, 128, 128, 0],
-    /* 7 */ [8, 32, 128, 256, 0],
-    /* 8 */ [32, 128, 258, 1024, 1],
-    /* 9 */ [32, 258, 258, 4096, 1]
-  ]; /* max compression */
+     [4, 10, 16, 32, 0] ,
+     [8, 16, 32, 32, 0],
+     [8, 16, 128, 128, 0],
+     [8, 32, 128, 256, 0],
+     [32, 128, 258, 1024, 1],
+     [32, 258, 258, 4096, 1]
+  ]; 
 
   var opt = opts[lvl];
 
@@ -7179,7 +7122,7 @@ UZIP.F.deflateRaw = function (data, out, opos, lvl) {
     bs = 0,
     ebits = 0,
     c = 0,
-    nc = 0; // last_item, literal_count, block_start
+    nc = 0; 
   if (dlen > 2) {
     nc = UZIP.F._hash(data, 0);
     strt[nc] = 0;
@@ -7189,13 +7132,12 @@ UZIP.F.deflateRaw = function (data, out, opos, lvl) {
 
   for (i = 0; i < dlen; i++) {
     c = nc;
-    //*
     if (i + 1 < dlen - 2) {
       nc = UZIP.F._hash(data, i + 1);
       var ii = (i + 1) & 0x7fff;
       prev[ii] = strt[nc];
       strt[nc] = ii;
-    } //*/
+    } 
     if (cvrd <= i) {
       if ((li > 14000 || lc > 26697) && dlen - i > 100) {
         if (cvrd < i) {
@@ -7209,19 +7151,12 @@ UZIP.F.deflateRaw = function (data, out, opos, lvl) {
       }
 
       var mch = 0;
-      //if(nmci==i) mch= nmch;  else
       if (i < dlen - 2) mch = UZIP.F._bestMatch(data, i, prev, c, Math.min(opt[2], dlen - i), opt[3]);
-      /*
-			if(mch!=0 && opt[4]==1 && (mch>>>16)<opt[1] && i+1<dlen-2) {
-				nmch = UZIP.F._bestMatch(data, i+1, prev, nc, opt[2], opt[3]);  nmci=i+1;
-				//var mch2 = UZIP.F._bestMatch(data, i+2, prev, nnc);  //nmci=i+1;
-				if((nmch>>>16)>(mch>>>16)) mch=0;
-			}//*/
       var len = mch >>> 16,
-        dst = mch & 0xffff; //if(i-dst<0) throw "e";
+        dst = mch & 0xffff; 
       if (mch != 0) {
         var len = mch >>> 16,
-          dst = mch & 0xffff; //if(i-dst<0) throw "e";
+          dst = mch & 0xffff; 
         var lgi = goodIndex(len, U.of0);
         U.lhst[257 + lgi]++;
         var dgi = goodIndex(dst, U.df0);
@@ -7255,21 +7190,20 @@ UZIP.F.deflateRaw = function (data, out, opos, lvl) {
 UZIP.F._bestMatch = function (data, i, prev, c, nice, chain) {
   var ci = i & 0x7fff,
     pi = prev[ci];
-  //console.log("----", i);
   var dif = (ci - pi + (1 << 15)) & 0x7fff;
   if (pi == ci || c != UZIP.F._hash(data, i - dif)) return 0;
   var tl = 0,
-    td = 0; // top length, top distance
+    td = 0; 
   var dlim = Math.min(0x7fff, i);
-  while (dif <= dlim && --chain != 0 && pi != ci /*&& c==UZIP.F._hash(data,i-dif)*/) {
+  while (dif <= dlim && --chain != 0 && pi != ci ) {
     if (tl == 0 || data[i + tl] == data[i + tl - dif]) {
       var cl = UZIP.F._howLong(data, i, dif);
       if (cl > tl) {
         tl = cl;
         td = dif;
-        if (tl >= nice) break; //*
+        if (tl >= nice) break; 
         if (dif + 2 < cl) cl = dif + 2;
-        var maxd = 0; // pi does not point to the start of the word
+        var maxd = 0; 
         for (var j = 0; j < cl - 2; j++) {
           var ei = (i - dif + j + (1 << 15)) & 0x7fff;
           var li = prev[ei];
@@ -7278,7 +7212,7 @@ UZIP.F._bestMatch = function (data, i, prev, c, nice, chain) {
             maxd = curd;
             pi = ei;
           }
-        } //*/
+        } 
       }
     }
 
@@ -7293,28 +7227,18 @@ UZIP.F._howLong = function (data, i, dif) {
   var oi = i,
     l = Math.min(data.length, i + 258);
   i += 3;
-  //while(i+4<l && data[i]==data[i-dif] && data[i+1]==data[i+1-dif] && data[i+2]==data[i+2-dif] && data[i+3]==data[i+3-dif]) i+=4;
   while (i < l && data[i] == data[i - dif]) i++;
   return i - oi;
 };
 UZIP.F._hash = function (data, i) {
   return (((data[i] << 8) | data[i + 1]) + (data[i + 2] << 4)) & 0xffff;
-  //var hash_shift = 0, hash_mask = 255;
-  //var h = data[i+1] % 251;
-  //h = (((h << 8) + data[i+2]) % 251);
-  //h = (((h << 8) + data[i+2]) % 251);
-  //h = ((h<<hash_shift) ^ (c) ) & hash_mask;
-  //return h | (data[i]<<8);
-  //return (data[i] | (data[i+1]<<8));
 };
-//UZIP.___toth = 0;
 UZIP.saved = 0;
 UZIP.F._writeBlock = function (BFINAL, lits, li, ebits, data, o0, l0, out, pos) {
   var U = UZIP.F.U,
     putsF = UZIP.F._putsF,
     putsE = UZIP.F._putsE;
 
-  //*
   var T, ML, MD, MH, numl, numd, numh, lset, dset;
   U.lhst[256]++;
   T = UZIP.F.getTrees();
@@ -7335,7 +7259,6 @@ UZIP.F._writeBlock = function (BFINAL, lits, li, ebits, data, o0, l0, out, pos) 
   for (var j = 0; j < 286; j++) U.lhst[j] = 0;
   for (var j = 0; j < 30; j++) U.dhst[j] = 0;
   for (var j = 0; j < 19; j++) U.ihst[j] = 0;
-  //*/
   var BTYPE = cstSize < fxdSize && cstSize < dynSize ? 0 : fxdSize < dynSize ? 1 : 2;
   putsF(out, pos, BFINAL);
   putsF(out, pos + 1, BTYPE);
@@ -7363,11 +7286,11 @@ UZIP.F._writeBlock = function (BFINAL, lits, li, ebits, data, o0, l0, out, pos) 
       dtree = U.dtree;
 
       putsE(out, pos, numl - 257);
-      pos += 5; // 286
+      pos += 5; 
       putsE(out, pos, numd - 1);
-      pos += 5; // 30
+      pos += 5; 
       putsE(out, pos, numh - 4);
-      pos += 4; // 19
+      pos += 4; 
 
       for (var i = 0; i < numh; i++) putsE(out, pos + i * 3, U.itree[(U.ordr[i] << 1) + 1]);
       pos += 3 * numh;
@@ -7399,7 +7322,6 @@ UZIP.F._writeBlock = function (BFINAL, lits, li, ebits, data, o0, l0, out, pos) 
     }
     pos = UZIP.F._writeLit(256, ltree, out, pos);
   }
-  //console.log(pos-opos, fxdSize, dynSize, cstSize);
   return pos;
 };
 UZIP.F._copyExact = function (data, off, len, out, pos) {
@@ -7410,13 +7332,8 @@ UZIP.F._copyExact = function (data, off, len, out, pos) {
   out[p8 + 3] = 255 - out[p8 + 1];
   p8 += 4;
   out.set(new Uint8Array(data.buffer, off, len), p8);
-  //for(var i=0; i<len; i++) out[p8+i]=data[off+i];
   return pos + ((len + 4) << 3);
 };
-/*
-	Interesting facts:
-	- decompressed block can have bytes, which do not occur in a Huffman tree (copied from the previous block by reference)
-*/
 
 UZIP.F.getTrees = function () {
   var U = UZIP.F.U;
@@ -7451,7 +7368,7 @@ UZIP.F.contSize = function (tree, hst) {
 UZIP.F._codeTiny = function (set, tree, out, pos) {
   for (var i = 0; i < set.length; i += 2) {
     var l = set[i],
-      rst = set[i + 1]; //console.log(l, pos, tree[(l<<1)+1]);
+      rst = set[i + 1]; 
     pos = UZIP.F._writeLit(l, tree, out, pos);
     var rsl = l == 16 ? 2 : l == 17 ? 3 : 7;
     if (l > 15) {
@@ -7463,7 +7380,7 @@ UZIP.F._codeTiny = function (set, tree, out, pos) {
 };
 UZIP.F._lenCodes = function (tree, set) {
   var len = tree.length;
-  while (len != 2 && tree[len - 1] == 0) len -= 2; // when no distances, keep one code with length 0
+  while (len != 2 && tree[len - 1] == 0) len -= 2; 
   for (var i = 0; i < len; i += 2) {
     var l = tree[i + 1],
       nxt = i + 3 < len ? tree[i + 3] : -1,
@@ -7498,7 +7415,7 @@ UZIP.F._hufTree = function (hst, tree, MAXL) {
   for (i = 0; i < hl; i++) if (hst[i] != 0) list.push({ lit: i, f: hst[i] });
   var end = list.length,
     l2 = list.slice(0);
-  if (end == 0) return 0; // empty histogram (usually for dist)
+  if (end == 0) return 0; 
   if (end == 1) {
     var lit = list[0].lit,
       l2 = lit == 0 ? 1 : 0;
@@ -7619,21 +7536,18 @@ UZIP.F.inflate = function (data, buf) {
     BFINAL = bitsF(data, pos, 1);
     BTYPE = bitsF(data, pos + 1, 2);
     pos += 3;
-    //console.log(BFINAL, BTYPE);
 
     if (BTYPE == 0) {
       if ((pos & 7) != 0) pos += 8 - (pos & 7);
       var p8 = (pos >>> 3) + 4,
-        len = data[p8 - 4] | (data[p8 - 3] << 8); //console.log(len);//bitsF(data, pos, 16),
+        len = data[p8 - 4] | (data[p8 - 3] << 8); 
       if (noBuf) buf = UZIP.F._check(buf, off + len);
       buf.set(new u8(data.buffer, data.byteOffset + p8, len), off);
-      //for(var i=0; i<len; i++) buf[off+i] = data[p8+i];
-      //for(var i=0; i<len; i++) if(buf[off+i] != data[p8+i]) throw "e";
       pos = (p8 + len) << 3;
       off += len;
       continue;
     }
-    if (noBuf) buf = UZIP.F._check(buf, off + (1 << 17)); // really not enough in many cases (but PNG and ZIP provide buffer in advance)
+    if (noBuf) buf = UZIP.F._check(buf, off + (1 << 17)); 
     if (BTYPE == 1) {
       lmap = U.flmap;
       dmap = U.fdmap;
@@ -7657,7 +7571,7 @@ UZIP.F.inflate = function (data, buf) {
         U.itree[(U.ordr[i] << 1) + 1] = l;
         if (l > tl) tl = l;
       }
-      pos += 3 * HCLEN; //console.log(itree);
+      pos += 3 * HCLEN; 
       makeCodes(U.itree, tl);
       codes2map(U.itree, tl, U.imap);
 
@@ -7670,19 +7584,16 @@ UZIP.F.inflate = function (data, buf) {
       var mx1 = F._copyOut(U.ttree, HLIT, HDIST, U.dtree);
       MD = (1 << mx1) - 1;
 
-      //var ml = decodeTiny(U.imap, (1<<tl)-1, HLIT , data, pos, U.ltree); ML = (1<<(ml>>>24))-1;  pos+=(ml&0xffffff);
       makeCodes(U.ltree, mx0);
       codes2map(U.ltree, mx0, lmap);
 
-      //var md = decodeTiny(U.imap, (1<<tl)-1, HDIST, data, pos, U.dtree); MD = (1<<(md>>>24))-1;  pos+=(md&0xffffff);
       makeCodes(U.dtree, mx1);
       codes2map(U.dtree, mx1, dmap);
     }
-    //var ooff=off, opos=pos;
     while (true) {
       var code = lmap[get17(data, pos) & ML];
       pos += code & 15;
-      var lit = code >>> 4; //U.lhst[lit]++;
+      var lit = code >>> 4; 
       if (lit >>> 8 == 0) {
         buf[off++] = lit;
       } else if (lit == 256) {
@@ -7694,7 +7605,6 @@ UZIP.F.inflate = function (data, buf) {
           end = off + (ebs >>> 3) + bitsE(data, pos, ebs & 7);
           pos += ebs & 7;
         }
-        //UZIP.F.dst[end-off]++;
 
         var dcode = dmap[get17(data, pos) & MD];
         pos += dcode & 15;
@@ -7703,10 +7613,6 @@ UZIP.F.inflate = function (data, buf) {
           dst = (dbs >>> 4) + bitsF(data, pos, dbs & 15);
         pos += dbs & 15;
 
-        //var o0 = off-dst, stp = Math.min(end-off, dst);
-        //if(stp>20) while(off<end) {  buf.copyWithin(off, o0, o0+stp);  off+=stp;  }  else
-        //if(end-dst<=off) buf.copyWithin(off, off-dst, end-dst);  else
-        //if(dst==1) buf.fill(buf[off-1], off, end);  else
         if (noBuf) buf = UZIP.F._check(buf, off + (1 << 17));
         while (off < end) {
           buf[off] = buf[off++ - dst];
@@ -7715,13 +7621,9 @@ UZIP.F.inflate = function (data, buf) {
           buf[off] = buf[off++ - dst];
         }
         off = end;
-        //while(off!=end) {  buf[off]=buf[off++-dst];  }
       }
     }
-    //console.log(off-ooff, (pos-opos)>>>3);
   }
-  //console.log(UZIP.F.dst);
-  //console.log(tlen, dlen, off-tlen+tcnt);
   return buf.length == off ? buf : buf.slice(0, off);
 };
 UZIP.F._check = function (buf, len) {
@@ -7729,7 +7631,6 @@ UZIP.F._check = function (buf, len) {
   if (len <= bl) return buf;
   var nbuf = new Uint8Array(Math.max(bl << 1, len));
   nbuf.set(buf, 0);
-  //for(var i=0; i<bl; i+=4) {  nbuf[i]=buf[i];  nbuf[i+1]=buf[i+1];  nbuf[i+2]=buf[i+2];  nbuf[i+3]=buf[i+3];  }
   return nbuf;
 };
 
@@ -7787,7 +7688,6 @@ UZIP.F._copyOut = function (src, off, len, tree) {
 };
 
 UZIP.F.makeCodes = function (tree, MAX_BITS) {
-  // code, length
   var U = UZIP.F.U;
   var max_code = tree.length;
   var code, bits, n, i, len;
@@ -7796,7 +7696,7 @@ UZIP.F.makeCodes = function (tree, MAX_BITS) {
   for (var i = 0; i <= MAX_BITS; i++) bl_count[i] = 0;
   for (i = 1; i < max_code; i += 2) bl_count[tree[i]]++;
 
-  var next_code = U.next_code; // smallest code for each length
+  var next_code = U.next_code; 
 
   code = 0;
   bl_count[0] = 0;
@@ -7821,11 +7721,10 @@ UZIP.F.codes2map = function (tree, MAX_BITS, map) {
     if (tree[i + 1] != 0) {
       var lit = i >> 1;
       var cl = tree[i + 1],
-        val = (lit << 4) | cl; // :  (0x8000 | (U.of0[lit-257]<<7) | (U.exb[lit-257]<<4) | cl);
+        val = (lit << 4) | cl; 
       var rest = MAX_BITS - cl,
         i0 = tree[i] << rest,
         i1 = i0 + (1 << rest);
-      //tree[i]=r15[i0]>>>(15-MAX_BITS);
       while (i0 != i1) {
         var p0 = r15[i0] >>> (15 - MAX_BITS);
         map[p0] = val;
@@ -7842,7 +7741,6 @@ UZIP.F.revCodes = function (tree, MAX_BITS) {
   }
 };
 
-// used only in deflate
 UZIP.F._putsE = function (dt, pos, val) {
   val = val << (pos & 7);
   var o = pos >>> 3;
@@ -7863,16 +7761,10 @@ UZIP.F._bitsE = function (dt, pos, length) {
 UZIP.F._bitsF = function (dt, pos, length) {
   return ((dt[pos >>> 3] | (dt[(pos >>> 3) + 1] << 8) | (dt[(pos >>> 3) + 2] << 16)) >>> (pos & 7)) & ((1 << length) - 1);
 };
-/*
-UZIP.F._get9 = function(dt, pos) {
-	return ((dt[pos>>>3] | (dt[(pos>>>3)+1]<<8))>>>(pos&7))&511;
-} */
 UZIP.F._get17 = function (dt, pos) {
-  // return at least 17 meaningful bytes
   return (dt[pos >>> 3] | (dt[(pos >>> 3) + 1] << 8) | (dt[(pos >>> 3) + 2] << 16)) >>> (pos & 7);
 };
 UZIP.F._get25 = function (dt, pos) {
-  // return at least 17 meaningful bytes
   return (dt[pos >>> 3] | (dt[(pos >>> 3) + 1] << 8) | (dt[(pos >>> 3) + 2] << 16) | (dt[(pos >>> 3) + 3] << 24)) >>> (pos & 7);
 };
 UZIP.F.U = (function () {
@@ -7902,7 +7794,6 @@ UZIP.F.U = (function () {
     dtree: [],
     imap: new u16(512),
     itree: [],
-    //rev9 : new u16(  512)
     rev15: new u16(1 << 15),
     lhst: new u32(286),
     dhst: new u32(30),
@@ -7938,19 +7829,11 @@ UZIP.F.U = (function () {
   pushV(U.fltree, 255 - 143, 9);
   pushV(U.fltree, 279 - 255, 7);
   pushV(U.fltree, 287 - 279, 8);
-  /*
-	var i = 0;
-	for(; i<=143; i++) U.fltree.push(0,8);
-	for(; i<=255; i++) U.fltree.push(0,9);
-	for(; i<=279; i++) U.fltree.push(0,7);
-	for(; i<=287; i++) U.fltree.push(0,8);
-	*/
   UZIP.F.makeCodes(U.fltree, 9);
   UZIP.F.codes2map(U.fltree, 9, U.flmap);
   UZIP.F.revCodes(U.fltree, 9);
 
   pushV(U.fdtree, 32, 5);
-  //for(i=0;i<32; i++) U.fdtree.push(0,5);
   UZIP.F.makeCodes(U.fdtree, 5);
   UZIP.F.codes2map(U.fdtree, 5, U.fdmap);
   UZIP.F.revCodes(U.fdtree, 5);
@@ -7959,10 +7842,4 @@ UZIP.F.U = (function () {
   pushV(U.ltree, 286, 0);
   pushV(U.dtree, 30, 0);
   pushV(U.ttree, 320, 0);
-  /*
-	for(var i=0; i< 19; i++) U.itree.push(0,0);
-	for(var i=0; i<286; i++) U.ltree.push(0,0);
-	for(var i=0; i< 30; i++) U.dtree.push(0,0);
-	for(var i=0; i<320; i++) U.ttree.push(0,0);
-	*/
 })();

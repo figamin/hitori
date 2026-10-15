@@ -1,10 +1,3 @@
-// Charts and controls for the public statistics pages (`/stats`, `/stats/<board>`).
-//
-// The page inlines its default series as `window.statsPage` and loads Chart.js from
-// cdnjs ahead of this script. The tables are rendered server-side, so a reader
-// without JavaScript (or with the CDN blocked) still sees every number - this file
-// draws the timeline chart, wires the Daily/Hourly + range controls (which refetch
-// the series from `/stats[/<board>]/series.json`) and adds click-to-sort.
 (function () {
   const data = window.statsPage;
   if (!data) return;
@@ -12,25 +5,6 @@
   const DAY = 86400;
   const nowSec = () => Math.floor(Date.now() / 1000);
 
-  // ---------------------------------------------------------------------------
-  // Chart colours come from the theme's CSS, so a theme styles the chart the same
-  // way it styles the rest of the page. They are read with `getComputedStyle` on
-  // every draw, and the chart is rebuilt when the theme stylesheet reloads:
-  //
-  //   --stats-chart-line            the line           (default: --name-color)
-  //   --stats-chart-fill-top        fill under the line (default: line at 35%)
-  //   --stats-chart-fill-bottom     fill at the axis    (default: line at 2%)
-  //   --stats-chart-grid            guide lines        (default: --border-color)
-  //   --stats-chart-text            tick labels        (default: --text-color)
-  //   --stats-chart-tooltip-bg      tooltip background (default: --post-color)
-  //   --stats-chart-tooltip-border  tooltip border     (default: --border-color)
-  //   --stats-chart-tooltip-text    tooltip text       (default: --text-color)
-  //
-  // The `--stats-chart-*` defaults live in `global.css` and point at the theme's own
-  // palette (the accent follows `--name-color`, then `--link-color`); a theme can
-  // override any of them in its own file. The values below are the last-resort
-  // fallback for when none of those resolve.
-  // ---------------------------------------------------------------------------
   const DEFAULT_COLORS = {
     accent: '#00ffe5',
     fillTop: 'rgba(0, 255, 229, 0.35)',
@@ -42,9 +16,6 @@
     tooltipText: '#e0e0e0'
   };
 
-  // The theme names one line colour, so the translucent fill under it is derived
-  // from that colour. Handles `#rgb`, `#rrggbb` and `rgb()`/`rgba()`; anything else
-  // (a named colour, `hsl()`) returns null and the caller keeps its default.
   function withAlpha(color, alpha) {
     const value = String(color || '').trim();
     const hex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(value);
@@ -75,8 +46,6 @@
     };
   }
 
-  // The range presets, as seconds before now; `all` has no lower bound (the server
-  // starts it at the first post). Kept in step with the route's own list.
   const PRESETS = {
     '5y': Math.round(5 * 365.25 * DAY),
     '3y': Math.round(3 * 365.25 * DAY),
@@ -93,12 +62,8 @@
   const endpoint = board ? `/stats/${encodeURIComponent(board)}/series.json` : '/stats/series.json';
 
   const hasCharts = typeof window.Chart !== 'undefined';
-  // The colours are set per chart below from the theme's CSS so they follow a
-  // theme switch; only the inherited font is set once here.
   if (hasCharts) Chart.defaults.font.family = 'inherit';
 
-  // Each mode remembers the range it last used, so switching Daily <-> Hourly keeps
-  // a sensible one (the ranges differ: hours span weeks, days span years).
   const remembered = {
     daily: RANGES_BY_MODE.daily.includes(data.range) ? data.range : '1y',
     hourly: RANGES_BY_MODE.hourly.includes(data.range) ? data.range : '4w'
@@ -156,8 +121,6 @@
       chart.update();
       return;
     }
-    // Read the palette now, so a theme change is picked up on the next draw (the
-    // chart is rebuilt when the theme stylesheet reloads - see `watchTheme`).
     const colors = readChartColors();
     const ctx = el.getContext('2d');
     const gradient = ctx.createLinearGradient(0, 0, 0, el.height || 220);
@@ -184,8 +147,6 @@
       options: {
         responsive: true,
         maintainAspectRatio: true,
-        // Switching Daily/Hourly or a range redraws in place; the bars/line should
-        // appear at once rather than tween between the two shapes.
         animation: false,
         interaction: { mode: 'index', intersect: false },
         plugins: {
@@ -256,9 +217,6 @@
     renderChart(lastSeries);
   }
 
-  // Rebuild the chart when the reader switches theme: `themes.js` changes the
-  // `#theme-css` link's href, and the new stylesheet fires `load` once it applies.
-  // `window.statsChart.restyle` is a hook for anything else that changes the palette.
   function watchTheme() {
     const link = document.getElementById('theme-css');
     if (link) link.addEventListener('load', restyleChart);
@@ -280,7 +238,7 @@
       if (note) note.textContent = 'Could not load that range.';
       return;
     }
-    if (id !== requestId) return; // a newer request has superseded this one
+    if (id !== requestId) return; 
     showSeries(series);
   }
 
@@ -319,9 +277,6 @@
     if (toInput) toInput.addEventListener('change', onDate);
   }
 
-  // Click a header to sort the board table. Rows carry `data-value` on their
-  // numeric cells (the visible text is formatted), so sorting uses the real
-  // number rather than a locale string.
   function makeSortable(table) {
     if (!table) return;
     const headers = [...table.querySelectorAll('th[data-sort]')];

@@ -11,10 +11,7 @@
 </form>
 <% results.forEach((r, i) => { %>
 <div class="latest-entry">
-<%# The public thread, with the post's own link form (`cells/reply.ejs`'s number link):
-    `/board/thread/<threadId>#q<postId>` opens the thread with the quick reply already
-    quoting the post (`public/js/qr.js`). The mod thread page this used to point at is a
-    different page entirely, and a moderator reading latest postings wants the board. %>
+
 <p class="latest-board"><a href="/<%= r.boardUri %>/thread/<%= r.thread.threadId %>#q<%= r.reply.postId %>">/<%= r.boardUri %>/<%= r.reply.postId %></a></p>
 <% if (r.isThread && r.thread.subject) { %><p><span class="subject"><%- r.thread.subject %></span></p><% } %>
 <% if (r.isTextBoard) { %>

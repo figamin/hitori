@@ -1,5 +1,3 @@
-// The captcha panel (Mod -> Captcha). Everything here is admin-only on the server side too;
-// this script only talks to those endpoints and keeps the page in step with the answers.
 (() => {
   const post = async (url, body, { form } = {}) => {
     const res = await fetch(url, {
@@ -25,7 +23,6 @@
   };
   const checked = (form, name) => form.querySelector(`[name="${name}"]`)?.checked === true;
 
-  // ------------------------------------------------------------------ the service itself
   const stateOf = (status) => {
     if (status.running && status.managed) return `running (started by Koshi, pid ${status.pid || '?'})`;
     if (status.running) return 'running (started outside Koshi)';
@@ -62,7 +59,6 @@
     }
   });
 
-  // ------------------------------------------------------------- when it is asked for
   document.getElementById('captcha-settings-form')?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const form = event.target;
@@ -80,7 +76,6 @@
     }
   });
 
-  // ---------------------------------------------------------------- pictures (config.toml)
   document.getElementById('captcha-create-form')?.addEventListener('submit', async (event) => {
     event.preventDefault();
     const form = event.target;
@@ -116,7 +111,6 @@
     }
   });
 
-  // ------------------------------------------------------------------ pictures per category
   const rowOf = (category) => document.querySelector(`#captcha-images-table tr[data-category="${CSS.escape(category)}"]`);
 
   const setCount = (category, count) => {

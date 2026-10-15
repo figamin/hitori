@@ -1,5 +1,3 @@
-// Post content comes in a blockquote (thread/reply cells) or a plain div (text
-// boards); the catalog renders thread text as `.thread-text`.
 const QUOTE_LINK_SELECTOR =
   '.quoteLink, .backlink, .thread-content a[href], .reply-content a[href], .thread-text a[href]';
 
@@ -30,11 +28,6 @@ const tooltips = {
     });
   },
 
-  // The server marks local quote links with `.quoteLink` (backlinks carry their
-  // own class). Links to a post on *another* board or thread - vichan's
-  // `>>>/o/297`, written as `/o/res/111.html#297` or `/o/thread/111#297` - come
-  // out of the message unfurnished, so pick them up here and give them the same
-  // hover preview; `loadQuote` already knows how to fetch another thread's JSON.
   processQuotes(root) {
     root.querySelectorAll(QUOTE_LINK_SELECTOR).forEach((quote) => {
       if (quote.classList.contains('quoteLink') || quote.classList.contains('backlink')) {
@@ -82,9 +75,6 @@ const tooltips = {
     const timeInfo = post.querySelector('.time-info');
     const dateText = timeInfo?.textContent?.trim();
     const contentEl = post.querySelector('.reply-content, .thread-content');
-    // The name span holds the capcode as well ("moth ## Admin <img>"); the preview draws
-    // the capcode itself from `signedRole`, so it is cut out of the name here - the
-    // cells keep it in its own `.capcode-label` element for exactly this.
     const nameEl = post.querySelector('.name')?.cloneNode(true);
     nameEl?.querySelectorAll('.capcode-label').forEach((el) => el.remove());
 
@@ -93,9 +83,6 @@ const tooltips = {
       subject: post.querySelector('.subject')?.innerHTML,
       postId: post.getAttribute('data-post-id'),
       creation: this.parsePostDate(dateText),
-      // The cells mark the capcode label on the name span itself, which is the only way
-      // to carry an imported one ("Mod", "Owner", ...) through to the preview - the
-      // classes alone only say "a staff member of some kind".
       signedRole:
         post.querySelector('[data-capcode]')?.getAttribute('data-capcode') ??
         (post.querySelector('.admin-name')
@@ -177,8 +164,6 @@ const tooltips = {
     }
   },
 
-  // Close the preview and forget the anchor it belonged to. Used when the
-  // anchor moves out from under the cursor without a mouseout being fired.
   dismiss() {
     this.activeQuote = null;
     this.hideTooltip();
@@ -191,10 +176,6 @@ const tooltips = {
     }
   },
 
-  // The preview belongs to a specific quote. Scrolling (or any reflow) can move
-  // that quote out from under a stationary cursor without firing mouseout,
-  // which would otherwise leave the preview stranded. Keep checking that the
-  // pointer is still over the anchor until the preview is closed.
   startPointerWatch() {
     if (this.watchTimer) return;
     this.watchTimer = setInterval(() => {
@@ -214,13 +195,6 @@ const tooltips = {
     }, 150);
   },
 
-  // Measure the preview and anchor it next to the quote. Where it lands matters:
-  // a preview that covers its own anchor makes the browser re-target the cursor
-  // onto the preview, which fires mouseout on the link, which tears the preview
-  // down and lets it open again - a visible open/close loop (long target posts
-  // hit it every time). So pick a placement that keeps the preview clear of the
-  // anchor, and only fall back to the clamped "cover it" position when the
-  // preview is too big to fit anywhere else.
   fitTooltip(tooltip, anchorRect) {
     const { margin } = this;
     tooltip.style.position = 'fixed';
@@ -250,9 +224,6 @@ const tooltips = {
       top >= margin &&
       top + height <= window.innerHeight - margin;
 
-    // Beside the quote first (the familiar tooltip position), then above/below
-    // it, which is what long posts need when the preview is too wide for either
-    // side.
     const spots = [
       { left: anchorRect.right + gap, top: anchorRect.top },
       { left: anchorRect.left - gap - width, top: anchorRect.top },
@@ -263,8 +234,6 @@ const tooltips = {
       if (fits(spot.left, spot.top) && !overlaps(spot.left, spot.top)) return spot;
     }
 
-    // Nothing fits (the preview is nearly as big as the window). Keep it on
-    // screen and accept the overlap - the CSS keeps it from stealing the hover.
     let left = anchorRect.right + gap;
     if (left + width > window.innerWidth - margin) left = anchorRect.left - gap - width;
     let top = anchorRect.top;
@@ -376,20 +345,10 @@ const tooltips = {
       this.activeQuote = null;
     };
 
-    // Clicks are not this file's business: `public/js/post-inline.js` opens the quoted post
-    // inside this one when the reader wants that, and marks (jumps to) the post when they
-    // do not. What stays here is the hover preview.
   }
 };
 
-// A link to a post in a thread other than the one it was written in - vichan's
-// `>>>/o/297` crossboard quote. Same-thread quotes and backlinks are already
-// marked by the server, and their ids are the ones that are meaningful on this
-// page.
 function isCrossboardQuote(anchor) {
-  // The post (or catalog card) the link was written in. Its board/thread are
-  // what "same thread" is measured against, and they keep another board's post
-  // id from being matched against this page's ids.
   const source = anchor.closest('[data-board][data-thread-id]');
   if (!source) return false;
 
@@ -436,9 +395,6 @@ const backlinks = {
 
     const threadId = document.querySelector('.thread')?.getAttribute('data-thread-id') || document.querySelector('.op')?.getAttribute('data-post-id');
 
-    // Every block is emptied before the links are rebuilt from the quotes that are in
-    // the DOM right now: a post that nothing quotes any more (because the quoting post
-    // was deleted) has to lose the link it was showing, not keep it.
     document.querySelectorAll('.backlinks').forEach((div) => {
       div.textContent = '';
     });
@@ -448,20 +404,11 @@ const backlinks = {
       const sourcePost = link.closest('[data-post-id]');
       if (!sourcePost || !fullUrl) return;
 
-      // `>>>/o/297`-style quotes carry another board's post id, which must not
-      // be matched against this page's ids (and can never have a backlink
-      // here).
       if (isCrossboardQuote(link)) return;
 
       const sourceId = sourcePost.getAttribute('data-post-id');
       const quotedId = fullUrl.split('#')[1];
 
-      // Quotes written by a post that is currently inlined (`post-inline.js`) are not the
-      // page's: they are the text of a *preview*. Counting them here credited them to the
-      // post the box is drawn in (wrong) or, once they were credited to the post the box
-      // shows, moved its entry up the row - a box sits earlier in the document than the
-      // posts it came from, so merely opening one used to reorder the page's backlink rows.
-      // A box builds its own row (`quotedBy` in `post-inline.js`).
       if (link.closest('.post-inline')) return;
 
       if (userPostIds.has(quotedId)) link.classList.add('you');
@@ -523,15 +470,10 @@ document.addEventListener('DOMContentLoaded', () => {
   tooltips.init();
   backlinks.init();
 
-  // Keep the last known pointer position up to date so the preview can tell
-  // when its anchor has slid out from under a (mostly) stationary cursor.
   document.addEventListener('mousemove', (event) => {
     tooltips.lastPointer = { x: event.clientX, y: event.clientY };
   }, { passive: true });
 
-  // Scrolling moves the hovered quote/backlink away from a stationary cursor
-  // without firing mouseout, which would otherwise leave the preview stranded.
-  // Capture catches scrolling inside nested containers as well as the window.
   window.addEventListener('scroll', () => tooltips.dismiss(), { passive: true, capture: true });
 
   const thread = document.querySelector('.thread');
@@ -540,9 +482,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Other scripts use these: `post-inline.js` inlines the very post a hover preview would
-// show, so it reads the same url parser and shares the same cache of post data (`const` at
-// the top of a classic script is not on `window`, hence this).
 window.tooltips = tooltips;
 window.backlinks = backlinks;
 

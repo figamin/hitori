@@ -1,13 +1,3 @@
-// The news editor: the body is written as post markup (the default) or as raw HTML, exactly
-// like the post editor's switch, with a live preview rendered by the server. `/mod/news` is
-// the only page this runs on; the routes are `be/routes/mod/news.js`.
-//
-// Two things about the storage shape matter here:
-//
-//   * `news.body` holds HTML and nothing else - the public page prints it unescaped - so markup
-//     mode is converted on save, by the server, with the same pipeline as a post.
-//   * there is no column for the source, so an existing article opens with the stored HTML in
-//     the box (raw mode) and the switch is how it is rewritten as markup.
 (() => {
   const form = document.getElementById('news-editor-form');
   if (!form) return;
@@ -27,8 +17,6 @@
   };
 
   let mode = form.dataset.mode === 'raw' ? 'raw' : 'markup';
-  // What is in the box for each mode, so switching back and forth does not lose an edit. The
-  // markup side starts empty for an existing article: its source was never stored.
   const values = { markup: mode === 'markup' ? textarea.value : '', raw: mode === 'raw' ? textarea.value : '' };
   let seq = 0;
   let previewTimer = null;
@@ -50,10 +38,7 @@
     return data;
   };
 
-  // ------------------------------------------------------------------ the preview
 
-  // The article's own chrome (title, byline, date, picture), then the body as the server
-  // rendered it. Only the body is injected as HTML - it is the server's markup either way.
   const renderChrome = (bodyHtml) => {
     const title = form.querySelector('[name=title]')?.value || '';
     const author = form.querySelector('[name=author]')?.value || '';
@@ -113,11 +98,8 @@
     previewTimer = setTimeout(refreshPreview, 250);
   };
 
-  // ------------------------------------------------------------------- the mode
 
   const applyMode = (next) => {
-    // Keep what is in the box for the mode being left (the other mode's value is what the
-    // server last handed over), then show the mode being entered.
     values[mode] = textarea.value;
     mode = next;
     form.dataset.mode = mode;
@@ -131,9 +113,7 @@
     refreshPreview();
   };
 
-  // --------------------------------------------------------- the styling buttons
 
-  // `[b][/b]`-style tags around the selection, or an empty pair with the cursor inside it.
   for (const button of form.querySelectorAll('[data-insert]')) {
     button.addEventListener('click', () => {
       const tag = button.dataset.insert || '';
@@ -156,7 +136,6 @@
     });
   }
 
-  // ----------------------------------------------------------------- the actions
 
   const collect = () => {
     const value = (name) => form.querySelector(`[name=${name}]`)?.value.trim() || '';
@@ -171,7 +150,6 @@
     };
   };
 
-  // `datetime-local` gives a local wall-clock string; the API wants something it can parse.
   function isoDate(local) {
     if (!local) return '';
     const when = new Date(local);
@@ -179,8 +157,6 @@
   }
 
   const adoptArticle = (newsPost) => {
-    // Publishing in markup mode must not throw the source away (it was never stored), so the
-    // page turns into that article's editor without reloading and the box keeps what was typed.
     form.dataset.newsId = String(newsPost.newsId);
     savedRaw = newsPost.contents || '';
     values.raw = savedRaw;
@@ -258,8 +234,6 @@
   textarea.addEventListener('input', queuePreview);
   wireDelete();
 
-  // The switch only makes sense once there is something to switch to: for a new article the
-  // markup side is empty until it is typed or published.
   toggle.textContent = mode === 'raw' ? 'Back to markup' : 'Edit raw HTML';
   hint.textContent = HINTS[mode];
   refreshPreview();

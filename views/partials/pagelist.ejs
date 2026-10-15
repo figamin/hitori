@@ -1,20 +1,8 @@
 <%
-/* Shared page list, used by every paginated view:
-
-     First | Prev | <up to five previous numbers> <current> <up to four next numbers> | Next | Last
-
-   The current page is the highlighted `.current` number. `locals.href` is a
-   function (pageNumber) => url, so each caller keeps its own URL shape, and the
-   optional `locals.extra` is appended after "Last" (the board page puts its
-   Catalog link there). */
 const lastPage = Math.max(1, Number(locals.totalPages) || 1);
 const current = Math.min(Math.max(1, Number(locals.page) || 1), lastPage);
 const size = Math.min(10, lastPage);
 
-// The window holds ten numbers (five before the current page and four after it).
-// A shorter page list cannot fill it, so slots are given up from the previous
-// side first, then the next, alternating - which ends with a window the size of
-// the page list itself.
 let before = 5;
 let after = 4;
 if (before + 1 + after > size) {
@@ -29,7 +17,6 @@ if (before + 1 + after > size) {
   }
 }
 
-// Slide the window inside [1, lastPage] so it always holds `size` numbers.
 let first = current - before;
 let last = first + size - 1;
 if (first < 1) {

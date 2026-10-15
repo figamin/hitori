@@ -4,7 +4,6 @@ const settings = {
     this.loadSavedSettings();
     this.filters = JSON.parse(localStorage.getItem('filters') || '[]');
 
-    // Apply filters immediately after initialization
     setTimeout(() => this.applyFilters(), 100);
   },
 
@@ -27,8 +26,6 @@ const settings = {
     closeBtn.textContent = '×';
     header.append(title, closeBtn);
 
-    // One link opens or closes every section at once; its label follows whatever the
-    // sections are doing, however they got that way.
     const expandAll = document.createElement('div');
     expandAll.className = 'settings-expand-all';
     const expandLink = document.createElement('a');
@@ -51,7 +48,6 @@ const settings = {
       return inner;
     };
 
-    // Filters
     const filtersContent = section('Filters & Post Hiding', true);
 
     const filterControls = document.createElement('div');
@@ -90,7 +86,6 @@ const settings = {
 
     filtersContent.append(filterControls, filtersList);
 
-    // Options. Each is a checkbox with its name, and a line under it saying what it does.
     const optionsContent = section('Posts & Threads', false);
 
     const options = [
@@ -119,7 +114,6 @@ const settings = {
       optionsContent.appendChild(item);
     });
 
-    // Custom CSS / JS
     const cssContent = section('Custom CSS', false);
     cssContent.innerHTML = `
       <p class="settings-option-desc">Your own CSS rules, added to every page.</p>
@@ -172,7 +166,6 @@ const settings = {
 
     if (!pattern) return;
 
-    // Check if trying to filter "Anonymous"
     if (type === 'name' && pattern.toLowerCase() === 'anonymous') {
       alert("Cannot create name filter on 'Anonymous'");
       return;
@@ -259,12 +252,7 @@ const settings = {
     const imagePreviewHover = document.getElementById('image-preview-hover').checked;
     const disableAutoWatch = document.getElementById('disable-auto-watch').checked;
     const hideFortunes = document.getElementById('hide-fortunes').checked;
-    // Nothing has to be applied for this one: `thread.js` reads it when a new post
-    // actually arrives.
     const newPostSound = document.getElementById('new-post-sound').checked;
-    // The inliner (`post-inline.js`) reads this when a quote is clicked, so nothing has to
-    // be applied here either - but a reader who turns it off sees the boxes that are open
-    // right now go away, rather than a mix of both behaviours.
     const postInlining = document.getElementById('post-inlining').checked;
     if (!postInlining) window.postInline?.closeAll();
 
@@ -312,10 +300,6 @@ const settings = {
     }
 
     if (hideFortunes) {
-      // A fortune is part of the post's stored markdown (`be/lib/fortunes.js`) and
-      // always sits in a div of its own, so hiding it is a CSS job. The shared
-      // `fortune` class covers new ones; the class names below belong to the ones
-      // written before that class existed, which are still in the boards' posts.
       combinedCSS += `
         .fortune,
         .excellentLuck,
@@ -335,7 +319,6 @@ const settings = {
 
     styleElement.textContent = combinedCSS;
 
-    // Apply JS
     const customJS = localStorage.getItem('customJS');
     if (customJS) {
       try {

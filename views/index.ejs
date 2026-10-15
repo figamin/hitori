@@ -275,14 +275,6 @@ var boardSections = [
                 </div>
                 <div class="featured collapsible">
                     <%
-                    // Which threads are up here is an editorial list, edited at /mod/featured
-                    // from any thread on any board; the table behind it is
-                    // `koshi_featured_threads` and the order is the order of the cards.
-                    //
-                    // The box is four cards wide and is never narrower than four. The panel
-                    // keeps the list at four or more, but a featured thread can be deleted
-                    // after it was picked, so a gap is filled from this snapshot's busiest
-                    // threads instead of the box drawing three cards.
                     var featured = (featuredThreads || []).filter(function (t) { return t.exists; });
                     var featuredKeys = {};
                     featured.forEach(function (t) { featuredKeys[t.boardUri + '/' + t.threadId] = true; });
@@ -366,11 +358,7 @@ var boardSections = [
                             <div class="tthumb"><% if (thread.files && thread.files.length > 0) { %><img src="<%= thread.files[0].thumb %>" alt="Thread thumbnail"><% } %></div>
                             <div class="chan-active-thread-info">
                                 <div class="tboard"><%= thread.boardName %></div>
-                                <%# The thread's own title, or a plain-text snippet of the post when
-                                    it has none. This cannot be the post's rendered HTML: the whole
-                                    card is one anchor, so a post that contains a link would close
-                                    that anchor early and the browser would drop the rest of the
-                                    card - this very div - outside it. %>
+                                
                                 <div class="ttitle"><%= unescapeHtml(thread.subject || postSnippet(thread.markdown || thread.message, 100)) || 'No subject' %></div>
                                 <div class="tmeta"><%= thread.postCount %> replies &bull; <span class="relative-time" data-ts="<%= new Date(thread.lastBump).getTime() %>"><%= activeTimeLabel(new Date(thread.lastBump).getTime()) %></span></div>
                             </div>
@@ -386,14 +374,7 @@ var boardSections = [
                 </div>
                 <div class="gallery">
                     <div class="scroll" id="scroller">
-                        <%# The strip shows about eight of these at a time (70px each) and the rest
-                            arrive as it is dragged. The ones on screen are the section's content,
-                            so they are fetched with the page at high priority - the same thing the
-                            active-thread previews above already do - while the ones off-screen stay
-                            lazy, so a page load does not pull all 24 pictures. With `loading="lazy"`
-                            on every one of them they were the last thing in the queue: the page's
-                            own background and badges finished first and the strip was still empty
-                            seconds after the thread previews had appeared. %>
+                        
                         <% (latestImages || []).slice(0, 24).forEach(function (image, i) { %>
                         <a href="<%= postUrl(image) %>"><img decoding="async" src="<%= image.thumb %>" alt="Small thumbnail"<% if (i < 8) { %> fetchpriority="high"<% } else { %> loading="lazy"<% } %>></a>
                         <% }); %>
@@ -474,9 +455,7 @@ var boardSections = [
         <div class="badges">
             <a href="https://mvcdb.miraheze.org/"><img src="/items/buttons/MVCDB.png" alt="MVCDB" loading="lazy" decoding="async"></a>
             <a href="https://endchan.org/miku/"><img src="/items/buttons/slashmiku.png" alt="slashmiku" loading="lazy" decoding="async"></a>
-            <%# 833 KB of animated GIF between the two biggest of these, at the very bottom of
-                the page: fetched when the reader gets there, never during a page load, and
-                the same animation is 256 KB as animated WebP. %>
+            
             <a href="https://hikari3.ch/"><img src="/items/buttons/hikari3.webp" alt="hikari3" width="88" height="31" loading="lazy" decoding="async"></a>
             <a href="https://holotower.org/"><img src="/items/buttons/hlt.png" alt="hlt" loading="lazy" decoding="async"></a>
             <a href="https://kissu.moe/"><img src="/items/buttons/kissu.gif" alt="kissu" loading="lazy" decoding="async"></a>

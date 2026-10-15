@@ -297,11 +297,6 @@ window.modStaffDeletePost = async function (postId, isThread, boardUri, threadId
 
 let banModalContext = null;
 
-// The report, ban and delete boxes share one look, 4chan X's (like the quick reply): a
-// floating window with a slim title bar naming the post - the handle it is dragged by -
-// and a close button, the fields as joined boxes, and the buttons along the bottom
-// right. The page stays usable behind it. The element with the box's id is the window
-// (shown with `display: block`); the close button and Escape hide it.
 function dialogMarkup(title, body, buttons) {
   return `
     <div class="post-dialog" role="dialog">
@@ -329,8 +324,6 @@ function wireDialog(overlay, onClose) {
     if (e.key === 'Escape') close();
   });
 
-  // Dragged by its title bar, as the quick reply is. Where it is left is where it opens
-  // next time (showDialog keeps it on screen).
   const header = overlay.querySelector('.post-dialog-header');
   header.addEventListener('mousedown', (e) => {
     if (e.button !== 0 || e.target.closest('.post-dialog-close')) return;
@@ -353,7 +346,6 @@ function wireDialog(overlay, onClose) {
   return close;
 }
 
-// Keeps a dialog's title bar on screen, so it can always be grabbed again.
 function clampDialog(overlay) {
   const rect = overlay.getBoundingClientRect();
   const left = Math.min(Math.max(rect.left, 0), Math.max(window.innerWidth - rect.width, 0));
@@ -362,9 +354,6 @@ function clampDialog(overlay) {
   overlay.style.top = `${top}px`;
 }
 
-// Shows a dialog: the first time centred near the top of the screen, afterwards
-// wherever it was dragged to. Other open dialogs are closed, as one post is handled
-// at a time.
 function showDialog(overlay) {
   document.querySelectorAll('#delete-modal, #report-modal, #mod-ban-modal').forEach((other) => {
     if (other !== overlay) other.style.display = 'none';
@@ -377,7 +366,6 @@ function showDialog(overlay) {
   clampDialog(overlay);
 }
 
-// "No.123 on /board/" for a dialog's title.
 function setDialogPost(overlay, postId, boardUri) {
   const ref = overlay.querySelector('.post-dialog-ref');
   if (ref) ref.textContent = `No.${postId}${boardUri ? ` on /${boardUri}/` : ''}`;
@@ -419,8 +407,6 @@ function createBanModal() {
     `
   );
   document.body.appendChild(modal);
-  // As in the moderation panel (mod.js): the message says "warned" while the type is a
-  // warning, as long as it is still one of the two notices.
   const banNotice = '(USER WAS BANNED FOR THIS POST)';
   const warnNotice = '(USER WAS WARNED FOR THIS POST)';
   const typeSelect = document.getElementById('mod-menu-ban-type');
@@ -666,7 +652,6 @@ function createModal() {
     opt.textContent = cat;
     categorySelect.appendChild(opt);
   });
-  // No categories configured: no dropdown, and a report needs none.
   if (!categories.length) reportModal.querySelector('.post-dialog-category').style.display = 'none';
 }
 

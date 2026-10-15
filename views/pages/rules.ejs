@@ -1,5 +1,4 @@
 <%
-    // Pass these from your route to override, e.g. res.render('rules', { activePage: 'rules' })
     const activePage = locals.activePage || 'rules';
 
     const navLinks = locals.navLinks || [
@@ -12,7 +11,6 @@
         { id: 'dl',     href: 'https://downloads.39chan.moe/', icon: 'fa-download',        label: 'Downloads',  desktopOnly: false }
     ];
 
-    // Rule text is rendered unescaped (with the "dash" output tag) so inline HTML like links/entities works.
     const globalRules = locals.globalRules || [
         `Do not upload, post, discuss, request, or link to anything that violates local laws or the laws of the United States.`,
         `If you are under the age of 18, you must immediately leave this website and not continue accessing it.`,
@@ -312,7 +310,6 @@
         </div>
     </footer>
 
-    <!--I compiled all the homepage scripts into a single file because it's convenient. Also hello to the dumbass reading this.-->
     <script src="/frontpage.js"></script>
     <script src="/verify.js"></script>
 </body>

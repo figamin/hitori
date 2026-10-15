@@ -1,8 +1,4 @@
 <%
-  // Chart controls on the statistics pages, modelled on 4stats.io. `chartBoard`
-  // (passed by the caller) is the board the chart is for, or '' for site-wide; the
-  // script reads it from `data-board` to pick its endpoint. The groups are rendered
-  // whole and shown per mode by the script, so both sets exist without JavaScript.
 %>
 <div class="stats-controls" id="stats-controls" data-board="<%= chartBoard || '' %>">
   <div class="stats-control-group">

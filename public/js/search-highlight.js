@@ -1,13 +1,3 @@
-// Search-result term highlighting for /search.
-//
-// The server writes the tokens the query actually matched into
-// #search-highlight-terms (stop words and one/two-letter words are already
-// filtered out there), so this only has to wrap them in the rendered results -
-// no re-implementation of the search rules.
-//
-// Wrapping happens in the DOM, which keeps the results server-rendered and
-// makes toggling the checkbox instant and lossless: unwrapping restores the
-// original text nodes exactly.
 (function () {
   'use strict';
 
@@ -30,7 +20,6 @@
       return typeof term === 'string' && term.length > 0;
     });
     if (!terms.length) return null;
-    // Longest first, so overlapping terms prefer the more specific one.
     terms.sort(function (a, b) {
       return b.length - a.length;
     });
@@ -41,8 +30,6 @@
     return String(value).replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
   }
 
-  // Results live in one fieldset per board; the form above them must not be
-  // touched (its labels could contain the search term).
   function resultRoots() {
     return document.querySelectorAll('.search-page fieldset.search-board-group');
   }
@@ -108,8 +95,6 @@
       if (parents.indexOf(parent) === -1) parents.push(parent);
       parent.replaceChild(document.createTextNode(mark.textContent), mark);
     }
-    // Merge the split text nodes back together so the next pass sees the
-    // original strings and no empty nodes are left behind.
     parents.forEach(function (parent) {
       parent.normalize();
     });
@@ -127,12 +112,8 @@
     var box = document.getElementById('search-highlight');
     if (!box) return;
 
-    // The preference is restored on every search form - including the empty one,
-    // so it can be set before searching - and is what drives the next page load.
     box.checked = storedValue() === '1';
 
-    // Null when the current query had no search terms (e.g. a `No.` or date-only
-    // search): the box still remembers its state, it just has nothing to mark.
     var options = readOptions();
 
     function render() {
@@ -149,7 +130,6 @@
       try {
         localStorage.setItem(STORAGE_KEY, box.checked ? '1' : '0');
       } catch (e) {
-        /* private mode: the preference just will not persist */
       }
       render();
     });

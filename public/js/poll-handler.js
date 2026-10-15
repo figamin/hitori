@@ -1,12 +1,6 @@
-// Poll option builder (post form) + poll voting.
-//
-// Voting is delegated from the document instead of binding to each poll as it
-// arrives, so it also works for polls inside threads pulled in later by
-// infinite scroll and on pages that have no post form (the /all overboard).
 document.addEventListener('DOMContentLoaded', function () {
   const addOptionBtn = document.getElementById('add-option');
   const pollOptions = document.getElementById('poll-options');
-  // Maximum number of poll options, supplied by the server (config.maxPollOptions).
   const maxOptions = Number(pollOptions && pollOptions.dataset.maxOptions) || 10;
   let optionCount = pollOptions ? pollOptions.querySelectorAll('input[name="poll_options[]"]').length : 2;
 
@@ -83,7 +77,7 @@ document.addEventListener('click', async function (event) {
       data = {};
     }
     if (response.ok && data.success) {
-      location.reload(); // Refresh to show updated results
+      location.reload(); 
     } else {
       alert(data.error || `Vote failed (HTTP ${response.status})`);
     }

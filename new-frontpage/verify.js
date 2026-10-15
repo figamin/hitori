@@ -16,7 +16,6 @@
 
     const style = document.createElement('style');
     style.textContent = `
-        /* Overlay container */
         #age-gate-overlay {
             position: fixed;
             top: 0;
@@ -75,7 +74,6 @@
             color: #ff009c;
         }
 
-        /* Buttons */
         .age-gate-btns {
             display: flex;
             gap: 10px;

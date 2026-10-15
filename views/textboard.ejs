@@ -57,7 +57,7 @@
                 <% 
                   const totalReplies = thread.postCount || thread.replies.length;
                   const lastFiveReplies = thread.replies.slice(-5);
-                  const startingReplyNumber = totalReplies - lastFiveReplies.length + 2; // Start from 2 since OP is 1
+                  const startingReplyNumber = totalReplies - lastFiveReplies.length + 2; 
                 %>
                 <% lastFiveReplies.forEach((reply, index) => { %>
                   <%- include('cells/textreply', { reply, thread, boardUri, replyNumber: startingReplyNumber + index, modView, showIp, globalStaff }) %>

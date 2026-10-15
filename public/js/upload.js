@@ -1,11 +1,6 @@
 const dropZone = document.getElementById('drop-zone');
 const fileInput = document.getElementById('image');
 const previewContainer = document.getElementById('preview-container');
-// The upload widget is optional: a text board's forms have no File row at all
-// (`views/partials/post-form.ejs` leaves it out when the include asked for `textBoard`), and
-// this script is loaded on those pages too. Everything that needs the widget checks this
-// first - without it the page's other scripts would never run, because the wiring below threw
-// on the missing elements.
 const uploadWidget = Boolean(dropZone && fileInput && previewContainer);
 const form =
   document.getElementById('post-form') ||
@@ -23,15 +18,12 @@ const maxFilesLimit = Math.max(
   ) || 3
 );
 
-// Only set up QR drop zone if we're on a thread page (check for QR element)
 const isThreadPage = document.getElementById('quick-reply') !== null;
 const dropZone_QR = isThreadPage ? document.getElementById('qr-drop-zone') : null;
 const previewContainer_QR = isThreadPage ? document.getElementById('qr-preview-container') : null;
 
 let currentFiles = [];
 let spoilerGroupSeq = 0;
-// Maps a preview card back to its File so the server-side index of a file can
-// be recomputed at submit time (removing a file shifts every later index).
 const previewFileOf = new WeakMap();
 
 Object.defineProperty(window, 'currentFiles', {
@@ -49,8 +41,6 @@ if (uploadWidget) {
   fileInput.setAttribute('max', String(maxFilesLimit));
 }
 
-// Set up main drop zone. `?.` because a text board's form has no drop zone to wire up (see
-// `uploadWidget`), and a guard per listener would be noisier than the one check above.
 dropZone?.addEventListener('click', () => {
   fileInput.click();
 });
@@ -71,7 +61,6 @@ dropZone?.addEventListener('drop', (e) => {
   handleFilesUpload(files);
 });
 
-// Set up QR drop zone only if it exists
 if (dropZone_QR) {
   dropZone_QR.addEventListener('click', () => {
     fileInput?.click();
@@ -111,7 +100,6 @@ if (uploadWidget) {
   });
 }
 
-// Without the widget there is nothing to paste into: the message goes in as typed.
 if (uploadWidget) {
   document.addEventListener('paste', (e) => {
     const items = (e.clipboardData || e.originalEvent.clipboardData).items;
@@ -143,17 +131,11 @@ function visibleFileCount() {
   return currentFiles.filter((f) => !isTegakiReplayFile(f)).length;
 }
 
-// The name a preview card shows: at most `window.fileNameMaxLength` characters with
-// the extension kept - the same rule the server applies to a post's file names (see
-// `truncateFileName` in `be/lib/formatting.js`), so every card is the same shape
-// whatever the reader picked.
 function displayFileName(name) {
   const value = String(name || '');
   const max = Number(window.fileNameMaxLength);
   if (!Number.isFinite(max) || max <= 0) return value;
 
-  // By code point, so an astral character is never sliced into a lone surrogate (the
-  // server's `truncateFileName` does the same).
   const chars = Array.from(value);
   if (chars.length <= max) return value;
 
@@ -204,8 +186,6 @@ function handleFilesUpload(files) {
 
     reader.readAsDataURL(file);
 
-    // Name and size on a line each, with the name truncated (the full one stays in
-    // the tooltip), so cards in a row line up instead of each being its own height.
     const nameSpan = document.createElement('span');
     nameSpan.className = 'preview-name';
     nameSpan.textContent = displayFileName(file.name);
@@ -215,9 +195,6 @@ function handleFilesUpload(files) {
     sizeSpan.textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
     fileInfo.append(nameSpan, sizeSpan);
 
-    // One radio group per file: the chosen value decides which placeholder image
-    // replaces the thumbnail. Each group needs its own name, otherwise a single
-    // choice would clear the others (radios with the same name form one group).
     const spoilerGroup = document.createElement('div');
     spoilerGroup.className = 'spoiler-options';
     spoilerGroup.style.marginTop = '5px';
@@ -281,8 +258,6 @@ function updateFileInput() {
 
 window.updateFileInput = updateFileInput;
 
-// Recompute the index each selected file has in the upload, so a spoiler choice
-// still points at the right file after another one was removed.
 function refreshSpoilerIndexes(root) {
   root.querySelectorAll('.preview-item').forEach((card) => {
     const file = previewFileOf.get(card);
@@ -294,8 +269,6 @@ function refreshSpoilerIndexes(root) {
   });
 }
 
-// Spoiler/NSFW selections of the files picked in `root` (the main post form, or
-// the quick reply form when its own preview copies are used), as form fields.
 window.getSpoilerFields = function (root) {
   const scope = root || document;
   refreshSpoilerIndexes(scope);
@@ -311,9 +284,8 @@ window.getSpoilerFields = function (root) {
 
 if (form) {
   form.addEventListener('submit', (e) => {
-  // Skip validation if the clicked button has data-no-upload-check="true"
   if (e.submitter && e.submitter.getAttribute('data-no-upload-check') === 'true') {
-    return; // Allow the form to submit without validation
+    return; 
   }
 
   updateFileInput();
@@ -329,8 +301,6 @@ if (form) {
     return;
   }
 
-  // One hidden field per selected file so the server knows which of them is
-  // spoilered and which is tagged NSFW.
   form.querySelectorAll('input[data-spoiler-field]').forEach((input) => input.remove());
   window.getSpoilerFields(form).forEach(({ name, value }) => {
     const input = document.createElement('input');

@@ -3,8 +3,6 @@
   head = '<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>';
   const totals = statsData.totals || {};
   const fmt = (n) => Number(n || 0).toLocaleString('en-US');
-  // Rolling day counts, the way 4stats shows them: posts/day is the last 24 hours,
-  // posts/min its per-minute average, threads/hour the last 24 hours over 24.
   const perMin = (n) => (Number(n || 0) / 1440).toFixed(2);
   const perHour = (n) => (Number(n || 0) / 24).toFixed(2);
   const share = (n) => (totals.posts24 ? Math.round((Number(n || 0) / totals.posts24) * 100) + '%' : '-');

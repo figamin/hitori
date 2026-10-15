@@ -156,7 +156,7 @@ its own is never picked. <%= categories.length %> categories known.
     <td><code><%= category.name %></code></td>
     <td class="captcha-image-list">
       <% if (!category.images) { %><span class="captcha-none">none</span><% } %>
-      <%# the pictures themselves are fetched per category by the script (they are big) %>
+      
       <span class="captcha-count"><%= category.images %></span>
       <button type="button" class="captcha-show-images" data-category="<%= category.name %>"<%= category.images ? '' : ' disabled' %>>show</button>
     </td>

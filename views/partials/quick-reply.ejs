@@ -1,7 +1,4 @@
-<%# The quick reply, laid out like 4chan X's: a slim draggable title bar, the fields as
-    joined boxes, the comment with its character count in the corner, the attachment (file,
-    embed, poll or tegaki), the captcha, and options and Submit along the bottom. qr.js keeps it in step with the reply
-    form (text, name, password, options and files are shared). %>
+
 <div id="quickReply">
   <div id="quickReplyHeader">
     <span class="qr-title">Quick Reply</span>
@@ -25,9 +22,7 @@
       <span class="qr-count" title="Max comment length: 4096"><span id="qr-charCount">0</span>/4096</span>
     </div>
 
-    <%# File / Embed / Poll / Tegaki, mirroring the reply form's "Select" row (qr.js builds the
-        links from it). The embed and poll fields are copies of the reply form's, kept in step
-        with them; a poll keeps the drop zone under it, as in the reply form. %>
+    
     <div class="qr-modes" id="qr-modes" hidden></div>
     <div class="qr-slot" id="qr-embed-slot" hidden></div>
     <div class="qr-slot" id="qr-poll-slot" hidden></div>
@@ -96,7 +91,6 @@
     color: var(--hover-link-color);
   }
 
-  /* The fields are joined boxes, one border between neighbours. */
   #quick-reply-form {
     display: flex;
     flex-direction: column;
@@ -172,7 +166,6 @@
     display: none;
   }
 
-  /* The selected files, as small cards (with their spoiler/NSFW choice). */
   #qr-file-section .preview-container,
   #qr-file-section #qr-preview-container {
     display: flex;
@@ -200,7 +193,6 @@
     outline: 2px dashed var(--link-color);
   }
 
-  /* File / Embed / Poll / Tegaki */
   #quick-reply-form .qr-modes {
     font-size: 11px;
     margin-top: 3px;
@@ -242,7 +234,6 @@
     display: none;
   }
 
-  /* The copies of the reply form's embed and poll fields. */
   #quick-reply-form .qr-slot:empty,
   #quick-reply-form .qr-slot[hidden] {
     display: none;

@@ -63,9 +63,6 @@ function nextReplyNumber() {
   return isTextBoardPage() ? count + 2 : count + 1;
 }
 
-// Does this link point at `postId` in *this* thread? A post can quote another thread
-// (`>>123` written there, which lands on that thread's page), and its id may match one
-// of ours by coincidence, so the path has to be checked as well as the fragment.
 function linksToPostHere(anchor, postId) {
   const href = anchor.getAttribute('href') || '';
   const [path, hash] = href.split('#');
@@ -74,19 +71,12 @@ function linksToPostHere(anchor, postId) {
   return new RegExp(`/thread/${threadAutoRefresh.threadId}(?:\\.html)?$`).test(path);
 }
 
-// A `>>123` pointing at a post that is no longer there can only lead to a 404, so the
-// anchor goes (text and all) - this is what a post that quoted a deleted post looks
-// like afterwards. Backlinks are not touched here: `backlinks.init()` rebuilds them
-// from the quotes that are left.
 function dropQuoteReferencesTo(postId) {
   document.querySelectorAll('a.quoteLink, a.backlink').forEach((anchor) => {
     if (linksToPostHere(anchor, postId)) anchor.remove();
   });
 }
 
-// `deletedPostDisplay: "mark"`: the post is left exactly as it is and only gets a red
-// `[DELETED]` label immediately before its name (`global.css` styles `.deleted-label`).
-// Marked once, so a later refresh does not stack another label on top.
 function markPostDeleted(post) {
   if (post.dataset.deleted === '1') return false;
   post.dataset.deleted = '1';
@@ -102,9 +92,6 @@ function markPostDeleted(post) {
   return true;
 }
 
-// A text board labels every reply with its position (`cells/textreply.ejs`), and a
-// deletion shifts all the later ones - while a new reply is numbered from the same
-// count (`nextReplyNumber`), so leaving them would make two replies share a number.
 function renumberReplies() {
   const start = isTextBoardPage() ? 2 : 1;
   document.querySelectorAll('.reply[data-post-id]').forEach((reply, index) => {
@@ -193,14 +180,6 @@ const threadAutoRefresh = {
     this.startTimer(this.manualRefresh || foundPosts ? 5 : this.lastRefresh * 2);
   },
 
-  // A post can be deleted while the thread is open. The refresh is where that is
-  // noticed: `/board/thread/<id>.json` answers with every post the thread still has, so
-  // a post the page is showing that is not in it has been deleted.
-  //
-  // What happens to it is the server's choice (`deletedPostDisplay` in the config):
-  //   remove - the post's whole container goes, together with the quotes other posts
-  //            wrote to it, and the backlinks are rebuilt from what is left
-  //   mark   - the post stays as it is and is labelled `[DELETED]` instead
   applyDeletedPosts(liveIds) {
     const mark = window.deletedPostDisplay === 'mark';
     let handled = 0;
@@ -214,8 +193,6 @@ const threadAutoRefresh = {
         return;
       }
 
-      // Removing a post above the reader's place makes the rest of the page jump up
-      // under them, so the scroll position is pulled back by what just went away.
       const container = post.closest('.post-container') || post;
       const { bottom, height } = container.getBoundingClientRect();
       const aboveViewport = bottom < 0;
@@ -253,14 +230,10 @@ const threadAutoRefresh = {
       .then((data) => {
         const posts = data.posts || [];
 
-        // Anything the page shows that the server no longer lists was deleted while
-        // the reader had the thread open (the OP is listed as `threadId`).
         const liveIds = new Set([String(data.threadId ?? data.thread?.threadId ?? this.threadId), ...posts.map((post) => String(post.postId))]);
         this.applyDeletedPosts(liveIds);
 
         let foundPosts = false;
-        // Only posts the reader did not write on this page are worth a sound; their
-        // own reply landing is already handled by `lastPostedId` below.
         let foundOthersPost = false;
         let replyNum = nextReplyNumber();
         for (let i = 0; i < posts.length; i++) {
@@ -272,10 +245,6 @@ const threadAutoRefresh = {
             lastReplyId = post.postId;
           }
         }
-        // The reader asked for this setting, so the sound is only for the thing they
-        // asked about: the *automatic* refresh bringing in somebody else's post. A
-        // manual refresh is their own click (nothing arrives that they did not ask
-        // for) and their own post needs no announcing either.
         if (foundOthersPost && !manual) this.playNewPostSound();
         if (!this.pendingRefresh) this.scheduleNextTimer(foundPosts);
       })
@@ -294,16 +263,10 @@ const threadAutoRefresh = {
       });
   },
 
-  // The reader turned on "play a sound when a thread gets a new post": say so when
-  // the auto refresh brings one in. The sound is made on first use, so a reader who
-  // never turns the setting on never downloads it; `/sound/new-post.mp3` is a
-  // placeholder - replace the file, or change the name here.
   playNewPostSound() {
     if (localStorage.getItem('newPostSound') !== 'true') return;
     if (!this.sound) this.sound = new Audio('/sound/mikudayo.mp3');
     this.sound.currentTime = 0;
-    // A page the reader has not interacted with yet is not allowed to play audio at
-    // all; that is the browser's decision, not something to report.
     const played = this.sound.play();
     if (played && played.catch) played.catch(() => {});
   },
@@ -349,12 +312,6 @@ const threadAutoRefresh = {
           updateTitle();
         }
 
-        // Our own post just landed at the end of the thread: take the page down
-        // to it. Posting from the quick reply leaves you looking at the bottom
-        // already (its panel sits there), but a post from the main reply form -
-        // which lives at the top of the thread - left the page where it was, so
-        // the new post was out of sight. Posts pulled in by the auto refresh are
-        // deliberately left alone.
         if (post.postId === lastPostedId) {
           window.scrollTo(0, document.documentElement.scrollHeight);
         }
@@ -404,11 +361,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const mainReplyForm = document.getElementById('reply-form');
 
   if (mainReplyForm) {
-    // One reply at a time. An impatient double click (or Enter pressed twice) used to
-    // fire two POSTs, and the moderation flood filter only refuses once a few have
-    // gone through - so the reader ended up with the same reply posted several times
-    // and a "Posting throttled by filter." on top. The flag makes the repeat submit a
-    // no-op; the button is disabled so the reader can see the request is in flight.
     let replyInFlight = false;
     mainReplyForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -426,12 +378,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const formData = new FormData(mainReplyForm);
 
-      // The box is pre-filled with the reader's remembered password (see
-      // `post-password.js`), so post what is in it. An emptied box means "a new one":
-      // `post-password.js#ensure` mints it, shows it in *both* boxes and remembers it, so
-      // the reader can read off the password this reply was signed with and their next
-      // post reuses it. (`generateRandomPassword` stays as the fallback for a page whose
-      // copy of that script is older than this handler.)
       const postPassword = window.postPassword
         ? window.postPassword.ensure()
         : String(formData.get('post-password') || '').trim() || generateRandomPassword();
@@ -451,15 +397,9 @@ document.addEventListener('DOMContentLoaded', () => {
           headers: {
             'X-Requested-With': 'XMLHttpRequest'
           },
-          // The session has to travel with this request: a logged-in moderator's reply
-          // is what carries their capcode (`#rs`), and the server refuses a `#rs` it
-          // cannot honour. `omit` dropped the login/hash cookies, so the post arrived
-          // anonymous - while every normal page load still sent them, which is why the
-          // reader looked logged in and still could not post a capcode.
           credentials: 'same-origin'
         });
 
-        // Check if response is JSON
         const contentType = response.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
           const result = await response.json();
@@ -519,8 +459,6 @@ document.addEventListener('DOMContentLoaded', () => {
             lastPostedId = result.post.postId;
             threadAutoRefresh.refreshPosts(true);
             if (typeof watchedThreads !== 'undefined') {
-              // A reply must not become the watched thread's label; the watcher
-              // takes it from the thread's OP (title, else the OP text).
               watchedThreads.autoWatchThread(result.post.threadId, result.post.boardUri, result.post.subject, result.post.message);
             }
           } else if (result.error) {
@@ -538,7 +476,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           }
         } else if (!response.ok) {
-          // Handle non-JSON error responses
           const errorText = await response.text();
 
           if (errorText.includes('/banned?id=')) {
@@ -590,7 +527,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// Reset unread count when user scrolls to bottom
 window.addEventListener('scroll', () => {
   const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 100;
   if (isAtBottom) {

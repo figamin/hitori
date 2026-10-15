@@ -1,10 +1,5 @@
 <% title = 'Featured Threads'; %>
-<%# The front page's FEATURED THREADS box. The list lives in `koshi_featured_threads`
-    (one row per thread, `position` is the order) and is edited here: pick a board,
-    find the thread, order the cards. The picker, the four-card rule and the save are
-    wired up by public/js/mod-featured.js.
-    Styles live here for the same reason the news editor's do: this page is the only
-    one that uses them. %>
+
 <style>
   .featured-admin {
     margin: 0 auto;
@@ -173,8 +168,7 @@
     <span class="featured-status" id="featured-status"></span>
   </div>
 
-  <%# The picker's markup, cloned per slot by js/mod-featured.js so the board list
-      and the button labels live in one place. %>
+  
   <template id="featured-slot-template">
     <div class="featured-slot">
       <div class="featured-slot-head">

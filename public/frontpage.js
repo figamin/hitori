@@ -403,7 +403,6 @@
     });
 })();
 
-//hail vocadb
 
 (function () {
   "use strict";
@@ -788,7 +787,6 @@
 (function () {
     'use strict';
 
-    // you already know what this does
     var currentYear = new Date().getFullYear();
     var yearRangePattern = /(©\s*\d{4}-)\d{4}/;
 
@@ -806,7 +804,6 @@
 (function () {
     'use strict';
 
-    // Topbar search: pressing Enter submits to the Express /search route.
     var input = document.getElementById('searchInput');
     if (!input) return;
 
@@ -820,11 +817,6 @@
 (function () {
     'use strict';
 
-    // Keeps two kinds of timestamp fresh without a page reload:
-    //  - ACTIVE THREADS ".relative-time"  -> "X minutes/hours/days ago"
-    //    (mirrors activeTimeLabel() in index.ejs)
-    //  - per-board RECENT ".board-time"   -> "Today, 11:37 AM" / "Yesterday, ..."
-    //    (mirrors boardTimeLabel() in index.ejs)
     var relativeNodes = document.querySelectorAll('.relative-time[data-ts]');
     var boardNodes = document.querySelectorAll('.board-time[data-ts]');
     if (!relativeNodes.length && !boardNodes.length) return;
@@ -881,6 +873,5 @@
     }
 
     tick();
-    // Every 30s is plenty for labels whose smallest unit is one minute.
     setInterval(tick, 30000);
 })();

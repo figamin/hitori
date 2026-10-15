@@ -29,12 +29,7 @@
 <div class="thread" id="<%= thread.threadId %>">
 <%- include('cells/op', { thread, boardUri, isThread: true, modView, showIp, globalStaff }) %>
 <div class="replies" id="replies">
-  <%# A `?last=` page (`[Last 50 Posts]` on the board) shows the newest replies only, so
-      the ones it left out are announced above the first reply it did show. The line is
-      what loads them, in place, through `public/js/omitted-replies.js`. Read through
-      `locals.`, like every optional local here: the mod thread route renders this same
-      view without them, and a bare name an EJS render was not given is a ReferenceError,
-      not `undefined`. %>
+  
   <% if (locals.omittedReplyCount) { %>
   <span class="summary omitted-notice" id="omitted-notice" data-board="<%= boardUri %>" data-thread-id="<%= thread.threadId %>" data-before="<%= locals.firstShownReplyId %>">
     <span class="omitted-posts"><a href="#" class="expand-omitted" title="Load the earlier replies"><%= locals.omittedReplyCount %> post<%= locals.omittedReplyCount === 1 ? '' : 's' %> and <%= locals.omittedImageCount %> image repl<%= locals.omittedImageCount === 1 ? 'y' : 'ies' %> omitted. Click to expand.</a></span>

@@ -45,19 +45,12 @@ document.addEventListener('DOMContentLoaded', function () {
   sortThreads('bump');
 });
 
-// Hover preview (as in 4chan X): putting the pointer on a catalog item opens a larger
-// copy of it over the grid, with the whole opening post and the thread's last few
-// replies - how long ago each was made and the start of what it says. The replies are
-// fetched the first time a thread is previewed and kept for a minute.
 (function () {
-  // PC only: a mouse (no touch screens, which fire mouse events on tap too) and a
-  // window wider than the mobile layout (global.css switches at 768px). Checked on
-  // every hover, so it also stops when the window is narrowed.
   const desktop = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 769px)');
 
   const CACHE_MS = 60000;
   const WIDTH_EXTRA = 60;
-  const cache = new Map(); // "board/threadId" -> { at, promise }
+  const cache = new Map(); 
   let panel = null;
 
   function timeAgo(date) {
@@ -92,8 +85,6 @@ document.addEventListener('DOMContentLoaded', function () {
     return (bytes / 1024).toFixed(2) + ' KB';
   }
 
-  // The file line a post shows above its thumbnail: name, download, size and size in
-  // pixels. Embeds (YouTube and the like) have no size and get none.
   function fileInfo(fileEl) {
     const { name, path, size, dims } = fileEl.dataset;
     if (!path || !size) return null;
@@ -102,8 +93,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const link = document.createElement('a');
     link.href = path;
     link.target = '_blank';
-    // Not `.file-link`: posts expand that to the whole name on hover, which would
-    // stretch the panel.
     link.className = 'catalog-preview-filename';
     link.title = name;
     link.textContent = name;
@@ -127,16 +116,10 @@ document.addEventListener('DOMContentLoaded', function () {
     panel = null;
   }
 
-  // Fortunes (`be/lib/fortunes.js`) are stored in the post body; the preview leaves
-  // them out. The class names after `.fortune` are those of fortunes written before
-  // that shared class existed (as in the "Hide fortunes" setting, settings.js).
   const FORTUNES =
     '.fortune, .excellentLuck, .goodLuck, .averageLuck, .badLuck, .tellYouNow, .outlookGood, ' +
     '.veryBadLuck, .godlyLuck, .youAreBanned, .divFortune';
 
-  // The reply's rendered body (greentext, spoilers, quotes...) on one line: line
-  // breaks become spaces, media and fortunes are dropped, and inline handlers -
-  // written for the thread page, where their functions exist - are removed.
   function bodyLine(html) {
     const doc = new DOMParser().parseFromString(String(html || ''), 'text/html');
     doc.body.querySelectorAll(FORTUNES).forEach((el) => el.remove());
@@ -154,8 +137,6 @@ document.addEventListener('DOMContentLoaded', function () {
     list.textContent = '';
     replies.forEach((reply) => {
       const href = '/' + board + '/thread/' + threadId + '#' + reply.postId;
-      // Not a link itself, because the body can hold links (quotes); a click anywhere
-      // else on the row opens the reply.
       const row = document.createElement('div');
       row.className = 'catalog-preview-reply';
       row.title = new Date(reply.creation).toLocaleString();
@@ -168,9 +149,7 @@ document.addEventListener('DOMContentLoaded', function () {
       age.textContent = timeAgo(reply.creation) + ':';
       const text = document.createElement('span');
       text.className = 'catalog-preview-body';
-      // `message` (the raw text) is what the endpoint sent before it sent `markdown`.
       const body = reply.markdown != null ? bodyLine(reply.markdown) : '';
-      // It may be HTML-escaped (MariaDB stores it so); parsing it decodes the entities.
       const plain =
         reply.markdown == null
           ? new DOMParser().parseFromString(String(reply.message || ''), 'text/html').body.textContent.replace(/\s+/g, ' ').trim()
@@ -207,12 +186,10 @@ document.addEventListener('DOMContentLoaded', function () {
       panel.appendChild(list);
     }
 
-    // Centred on the item, a little wider, and kept on screen.
     const width = rect.width + WIDTH_EXTRA;
     const viewport = document.documentElement.clientWidth;
     const left = Math.min(Math.max(rect.left + rect.width / 2 - width / 2, 4), viewport - width - 4);
     panel.style.width = width + 'px';
-    // Never shorter than the item, so leaving the panel never lands back on the item.
     panel.style.minHeight = rect.height + 12 + 'px';
     panel.style.left = left + window.scrollX + 'px';
     panel.style.top = rect.top + window.scrollY - 6 + 'px';
@@ -238,8 +215,6 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!desktop.matches || !(e.target instanceof Element) || e.target.closest('.catalog-preview')) return;
     const item = e.target.closest('.catalog-thread');
     if (!item) return;
-    // Opens the moment the pointer is on an item; while it is open the panel covers
-    // the item, so this does not fire again for it.
     if (panel?.dataset.threadId === item.dataset.threadId) return;
     open(item);
   });

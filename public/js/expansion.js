@@ -17,7 +17,6 @@ window.initializeExpansion = function () {
 
         try {
           isExpanding = true;
-          // Get the board URI either from the URL or from the thread's data attribute
           const currentPath = location.pathname.split('/').filter((p) => p)[0];
           const boardUri =
             currentPath === 'all'
@@ -31,10 +30,8 @@ window.initializeExpansion = function () {
           if (!response.ok) throw new Error('Network response was not ok');
           const data = await response.json();
 
-          // Get existing reply IDs efficiently using a Set
           const existingReplies = new Set(Array.from(footer.parentNode.querySelectorAll('.reply')).map((r) => r.dataset.postId));
 
-          // Filter out the last 5 posts that are already shown
           const lastFivePostIds = new Set(data.posts.slice(-5).map((post) => post.postId.toString()));
           const newReplies = data.posts.filter(
             (reply) => !existingReplies.has(reply.postId.toString()) && !lastFivePostIds.has(reply.postId.toString())
@@ -44,12 +41,9 @@ window.initializeExpansion = function () {
           for (let i = 0; i < newReplies.length; i += chunkSize) {
             const chunk = newReplies.slice(i, i + chunkSize);
 
-            // Request rendered replies for this chunk
             const replyPromises = chunk.map((reply, chunkIndex) => {
-              // Calculate the actual reply number based on its position in the thread
-              // The index in the original data array represents its position in the thread
               const originalIndex = data.posts.findIndex((p) => p.postId === reply.postId);
-              const replyNumber = originalIndex + 1; // +1 because we want 1-based indexing
+              const replyNumber = originalIndex + 1; 
 
               return fetch(`/${boardUri}/cells/reply`, {
                 method: 'POST',
@@ -81,18 +75,15 @@ window.initializeExpansion = function () {
               initializeThumbnails();
             }
 
-            // Small delay between chunks to prevent freezing
             if (i + chunkSize < newReplies.length) {
               await new Promise((resolve) => setTimeout(resolve, 50));
             }
           }
 
-          // Update display states
           additionalReplies.style.display = 'block';
           omittedPosts.style.display = 'none';
           expandedPosts.style.display = 'inline';
 
-          // Single backlinks initialization after all content is added
           if (typeof backlinks?.init === 'function') {
             backlinks.init();
           }

@@ -38,11 +38,6 @@ const watchedThreads = {
     } catch (e) {}
   },
 
-  // On a phone a floating window would cover the page, so there the watcher is part of
-  // the page instead: under the banner, board title and description (#banner-container),
-  // above the post form - or at the top of the content on a page without a banner. It
-  // moves back to its floating place when the window is widened past the stylesheet's
-  // 768px line.
   placeWatchList() {
     const modal = document.querySelector('.watch-list-modal');
     if (!modal) return;
@@ -122,13 +117,9 @@ const watchedThreads = {
     }
   },
 
-  // Label for a watched thread: the thread's title when it has one, otherwise the
-  // first 15 characters of the opening post's text (`:name:` style markup and
-  // files are not part of it, they render outside .thread-content).
   makeLabel(title, text) {
     const clean = (value) => String(value || '').replace(/\s+/g, ' ').trim();
 
-    // `'No subject'` is the placeholder older callers stored; treat it as none.
     const cleanTitle = clean(title);
     if (cleanTitle && cleanTitle !== 'No subject') return cleanTitle.substring(0, 50);
 
@@ -137,11 +128,6 @@ const watchedThreads = {
     return cleanText.length > 15 ? `${cleanText.substring(0, 15)}...` : cleanText;
   },
 
-  // The label always comes from the thread's opening post. When the OP is on the
-  // page it is the only source, so the `subject`/`message` a caller passes for a
-  // reply can never become the title. A brand new thread (posted from the board
-  // page and redirected to before its OP renders) has no OP yet, so there the
-  // submitted subject/message are used instead.
   threadLabel(op, subject, message) {
     if (op) {
       const title = op.querySelector('.subject')?.textContent;
@@ -354,7 +340,6 @@ const watchedThreads = {
     const watchListBody = document.querySelector('.watch-list-body');
     if (!watchListBody) return;
 
-    // Re-read the store so a label derived below can be written back.
     const stored = this.getStoredWatchedData();
     const entries = [];
     Object.keys(stored).forEach((board) => {
@@ -374,8 +359,6 @@ const watchedThreads = {
 
     let labelAdded = false;
     entries.forEach(({ board, thread, data }) => {
-      // The OP on screen is authoritative: re-derive the label so a stored one
-      // taken from a reply (or a missing one) is corrected to the thread title.
       const op = document.querySelector(
         `.op[data-board="${board}"][data-post-id="${thread}"], .op[data-board="${board}"][data-thread-id="${thread}"]`
       );

@@ -245,7 +245,6 @@ a {
     }
 }
 
-/* FEATURED THREADS can also be collapsed on mobile */
 .collapse-toggle--mobile {
     display: inline-block;
 }
@@ -408,15 +407,6 @@ a {
     white-space: nowrap;
 }
 
-/*
-.clock-est {
-    font-size: 10px;
-    color: #d4d4d4;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-*/
 
 .header-search {
     display: flex;
@@ -915,9 +905,6 @@ a {
     margin: 0;
 }
 
-/* Remove border-bottom from the last *visible* board, not just the last
-   one in the DOM — a board followed only by hidden/NSFW-hidden siblings
-   should look like the last item too. */
 .board:not(:has(~ .board:not(.hidden))) {
     border-bottom: none;
 }
@@ -1404,15 +1391,6 @@ body.nsfw-hidden .board.nsfw {
         white-space: nowrap;
     }
 
-    /*
-    .mob-clock .clock-est {
-        font-size: 10px;
-        color: var(--chan-text-dim);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    */
 
     .topbar {
         display: block;

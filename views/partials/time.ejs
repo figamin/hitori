@@ -1,8 +1,4 @@
 <%
-// The readable timestamp, with the relative time as its tooltip. Both formatters are made
-// once per process and handed to the views as a local (`be/lib/formatting.js: postTime`)
-// - building a RelativeTimeFormat and a toLocaleString options object per post was a
-// measurable share of a page render.
 var stamp = postTime(date);
 %>
 <span class="time-info" title="<%= stamp.ago %>"><%= stamp.text %></span>

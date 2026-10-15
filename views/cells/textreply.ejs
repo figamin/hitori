@@ -1,6 +1,4 @@
 <%
-// See cells/op.ejs: the mod panel keeps thread links inside the panel, the number
-// link stays public because that is where the reply form is.
 var archivePrefix = locals.isArchive ? 'archive/' : '';
 var href = '/' + boardUri + '/' + archivePrefix + 'thread/' + thread.threadId;
 var threadHref = modView ? '/mod/thread/' + boardUri + '/' + thread.threadId : href;
@@ -33,10 +31,7 @@ data-board="<%= boardUri %>"
     <% } %>
   </div>
   <div class="reply-content"><%
-    // YouTube / nicovideo / BiliBili links get an inline player and Twitter/X + Bluesky links are pointed at FxEmbed (be/lib/embeds.js).
     let parsedMSG = locals.expandMediaEmbeds(reply.markdown);
-    // vichan links to its own shape, relative or absolute (its `root` config),
-    // e.g. /mmd/res/45.html#48 or https://39chan.moe/mmd/res/45.html#48.
     const boardLinkRegex = /href=["'](?:[^"']*?\/)?([\w-]+)\/res\/(\d+)\.html(?:#(\d+))?["']/gi;
     parsedMSG = parsedMSG.replace(boardLinkRegex, (match, board, threadId, post) => {
       const archivePrefix = locals.isArchive ? 'archive/' : '';

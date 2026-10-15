@@ -1,8 +1,4 @@
 <%
-  // The status the route answered with - `be/middleware/layout.js` hands every view
-  // `res.statusCode` as `httpStatus`. This page serves every failure, and it used to call
-  // itself "Server Error - 500" whatever the code was, so a 400, 403 or 404 read like a
-  // crash.
   const status = Number(locals.httpStatus) || 500;
   title = (status >= 500 ? 'Server Error - ' : 'Error - ') + status;
 %>

@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // Use event delegation for hide board buttons
   document.addEventListener('click', (e) => {
     if (e.target.classList.contains('hide-board-btn')) {
       const boardUri = e.target.dataset.board;
@@ -46,15 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Hide boards on page load and when new content is added
   const hideHiddenBoards = () => {
     const hiddenBoards = getHiddenBoards();
     hiddenBoards.forEach(hideBoard);
   };
 
-  // /h/ used to be hidden for everyone by default; the board does not exist, so the
-  // entry this left in every reader's list (and its "unhidden on purpose" flag) is
-  // cleared out.
   const initializeHiddenBoards = () => {
     const hiddenBoards = getHiddenBoards();
     if (hiddenBoards.includes('h')) saveHiddenBoards(hiddenBoards.filter((b) => b !== 'h'));
@@ -64,13 +59,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeHiddenBoards();
   hideHiddenBoards();
 
-  // Listen for new content being added via infinite scroll
   document.addEventListener('contentAdded', hideHiddenBoards);
 
   const addHiddenBoardsList = () => {
     const hiddenBoards = getHiddenBoards();
     if (hiddenBoards.length > 0) {
-      // Remove existing list if present
       const existingList = document.querySelector('.hidden-boards-list');
       if (existingList) {
         existingList.remove();
@@ -103,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         unhideButton.style.fontSize = '12px';
         unhideButton.onclick = () => {
           showBoard(board);
-          addHiddenBoardsList(); // Refresh the list
+          addHiddenBoardsList(); 
         };
         boardItem.appendChild(unhideButton);
 

@@ -246,10 +246,6 @@
       el.autoplay = true;
       el.addEventListener('click', (e) => e.stopPropagation());
     } else {
-      // A browser with no decoder for the format (JPEG XL, in Chrome and Firefox) cannot
-      // show the original, and a failed image leaves the stage blank. The thumbnail is
-      // always a WebP the browser can read, so the slide falls back to it; the file
-      // itself stays one click away in the header's filename link.
       el.addEventListener('error', () => {
         if (el.dataset.fellBack) return;
         el.dataset.fellBack = '1';

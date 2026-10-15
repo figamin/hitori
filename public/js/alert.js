@@ -1,7 +1,3 @@
-// Replaces the browser's alert() with a box drawn in the current theme (as vichan does),
-// so messages like "Flood detected" match the site instead of the browser's own dialog.
-// Unlike the native one it does not block: it returns a promise that resolves when the
-// box is closed, for callers that need to wait (e.g. `await alert('Saved'); reload()`).
 (function () {
   const queue = [];
   let handler = null;
@@ -31,7 +27,6 @@
   function show() {
     if (!handler) {
       build();
-      // Lay out the closed state first, so the first box also gets the transition.
       void handler.offsetWidth;
     }
     setText(handler.querySelector('#alert_message'), queue[0].message);

@@ -1,25 +1,13 @@
-// The quick reply is a floating window sized for a mouse, and a phone has the reply
-// form under the thread instead: `#quickReply` is hidden by the stylesheet on exactly
-// this query (public/css/global.css), and a quote goes into that form rather than into
-// a panel nobody can see. Change one and change the other.
 const QUICK_REPLY_HIDDEN = '(max-width: 768px), (hover: none) and (pointer: coarse)';
 
 function quickReplyHidden() {
   return window.matchMedia(QUICK_REPLY_HIDDEN).matches;
 }
 
-// Put `>>id` into the quick reply, on a line of its own at the cursor, and open it. Every
-// click quotes - the same post again too, as 4chan X does. The textarea's input event is
-// fired so the reply form's copy and the character count follow.
 function insertQuote(id) {
   const hidden = quickReplyHidden();
   const quickreplydiv = document.getElementById('quickReply');
-  // Where the panel is not shown, the quote goes to the reply form, which is the form
-  // a mobile poster submits; the two textareas mirror each other, so the quote ends up
-  // in the quick reply's box as well.
   const msg = document.getElementById(hidden ? 'message' : 'message-qr');
-  // An archived thread has no reply form and cannot be posted to: there is nowhere to
-  // put the quote, and the panel is not shown there either.
   if (!msg) return;
   if (!hidden) quickreplydiv.classList.add('show-quickreply');
 
@@ -36,8 +24,6 @@ function insertQuote(id) {
   msg.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
-// A page opened with `#q<id>` (a "Reply to this post" link followed from another page)
-// opens the quick reply with that quote; any other hash closes it.
 function quickReply() {
   const quickreplydiv = document.getElementById('quickReply');
   const hash = window.location.hash;
@@ -48,9 +34,6 @@ function quickReply() {
   }
 }
 
-// "Reply to this post" links on this page are handled here rather than through the
-// hash: clicking one whose hash is already in the address bar changes nothing, so the
-// browser would never say it was clicked.
 document.addEventListener('click', (e) => {
   const link = e.target instanceof Element && e.target.closest('a.linkQuote[href*="#q"]');
   if (!link || e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
@@ -115,14 +98,10 @@ function initDragging(element, handle) {
 initDragging(document.getElementById('quickReply'), document.getElementById('quickReplyHeader'));
 window.onhashchange = quickReply;
 
-// Add character counter for quick reply
 document.getElementById('message-qr').addEventListener('input', function () {
   document.getElementById('qr-charCount').textContent = this.value.length;
 });
 
-// Mirror one form control onto the other. A missing side must not abort the script
-// - everything after this point (the AJAX submit handler included) would never be
-// registered.
 function syncText(a, b) {
   if (!a || !b) return;
   a.oninput = function () {
@@ -143,24 +122,16 @@ function syncClick(a, b) {
   };
 }
 
-// Sync textareas
 let qr_ta = document.getElementById('message-qr');
 let st_ta = document.getElementById('message');
 syncText(qr_ta, st_ta);
 
-// Sync names
 let qr_nm = document.getElementById('name-qr');
 let st_nm = document.getElementById('name');
 syncText(qr_nm, st_nm);
 
-// Sync the deletion password. The server pre-fills the same random password in both
-// forms, and whichever one is submitted becomes the post's password, so an edit to
-// either box has to show up in the other.
 syncText(document.getElementById('post-password-qr'), document.getElementById('post-password'));
 
-// Sync the post options. Each is a checkbox in both forms (the reply form and the
-// quick reply), so they mirror one for one and a reader can combine them - sage and
-// fortune together, say. Both post `fortune`/`sage`/`nonoko` = "true".
 for (const name of ['fortune', 'sage', 'nonoko']) {
   syncClick(document.getElementById(`${name}-qr`), document.getElementById(name));
 }
@@ -182,9 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Files: the quick reply has no file input of its own. Its drop zone opens the reply
-  // form's picker and a drop anywhere on the panel goes to the reply form's upload code
-  // (upload.js), so both forms always hold the same files.
   const quickReplyEl = document.getElementById('quickReply');
   const mainFileInput = mainForm && mainForm.querySelector('#image');
   const qrDropZone = document.getElementById('qr-dropzone');
@@ -221,11 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Embed and poll fields: the quick reply has copies of the reply form's, kept in step
-  // with them both ways (as the comment is), so both forms always show the same embed URL
-  // and poll. Fields pair up by position; "+ Add Option" clicks the reply form's button,
-  // and any change to the reply form's fields (an option added, the button hidden at the
-  // limit) makes a new copy.
   function mirrorFields(source, slot) {
     if (!source || !slot) return null;
     const fields = (root) => root.querySelectorAll('input, select, textarea');
@@ -272,17 +235,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const qrEmbed = mirrorFields(document.getElementById('embed-mode-content'), document.getElementById('qr-embed-slot'));
   const qrPoll = mirrorFields(document.getElementById('poll-details'), document.getElementById('qr-poll-slot'));
 
-  // The reply form clears its fields without an input event (the embed URL when leaving
-  // Embed, everything on reset), so the copies are refreshed after those too.
   function refreshMirrors() {
     qrEmbed?.refresh();
     qrPoll?.refresh();
   }
   mainForm?.addEventListener('reset', () => setTimeout(refreshMirrors));
 
-  // File / Embed / Poll / Tegaki. The reply form owns the mode (its "Select" row shows and
-  // hides its fields, and Tegaki opens the drawing board), so these links click its
-  // buttons and then follow whichever one is active.
   const mainModeButtons = mainForm ? Array.from(mainForm.querySelectorAll('.mode-select-btn')) : [];
   const qrModes = document.getElementById('qr-modes');
   const qrModeLinks = [];
@@ -322,7 +280,6 @@ document.addEventListener('DOMContentLoaded', () => {
   updateMode();
 
   function reattachEventListeners() {
-    // Remove button event listeners
     const qrRemoveButtons = qrFileSection.querySelectorAll('.remove-file');
     const mainRemoveButtons = mainForm.querySelectorAll('.remove-file');
 
@@ -334,8 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
       };
     });
 
-    // Spoiler / NSFW radio listeners (the QR file section is a copy of the
-    // main form's preview cards, so the two lists line up one to one).
     const qrSpoilerRadios = qrFileSection.querySelectorAll('input[type="radio"][name^="spoiler_"]');
     const mainSpoilerRadios = mainForm.querySelectorAll('input[type="radio"][name^="spoiler_"]');
 
@@ -349,7 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
       };
     });
 
-    // Also listen to main form spoiler changes
     mainSpoilerRadios.forEach((radio, index) => {
       radio.addEventListener('change', () => {
         const qrRadios = qrFileSection.querySelectorAll('input[type="radio"][name^="spoiler_"]');
@@ -360,9 +314,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Add AJAX submission for quick reply form
-  // One reply at a time; see the note in `thread.js`. A double click on Submit used to
-  // send the quick reply twice and post it twice.
   let qrInFlight = false;
   qrForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -373,10 +324,8 @@ document.addEventListener('DOMContentLoaded', () => {
       button.disabled = true;
     });
 
-    // Create a new FormData object
     const formData = new FormData();
 
-    // Add all form fields except file
     const formFields = new FormData(qrForm);
     for (let [key, value] of formFields.entries()) {
       if (key !== 'image') {
@@ -384,23 +333,16 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    // An emptied password box means "a new one": `post-password.js#ensure` mints it,
-    // leaves it in both boxes and remembers it, so the reader can read off the password
-    // this reply was signed with and their next post reuses it. Without this the quick
-    // reply posted the empty string, which the server refuses.
     if (window.postPassword && typeof window.postPassword.ensure === 'function') {
       formData.set('post-password', window.postPassword.ensure());
     }
 
-    // Add files from main form
-    // An embed is posted without files, as the reply form does (it disables its input).
     if (mainFileInput && !mainFileInput.disabled && mainFileInput.files.length > 0) {
       for (let i = 0; i < mainFileInput.files.length; i++) {
         formData.append('image', mainFileInput.files[i]);
       }
     }
 
-    // Add spoiler / NSFW states (the index of each file is resolved by upload.js)
     if (window.getSpoilerFields) {
       window.getSpoilerFields(mainForm).forEach(({ name, value }) => formData.append(name, value));
     }
@@ -445,7 +387,6 @@ document.addEventListener('DOMContentLoaded', () => {
             savePostPassword(postKey, formData.get('post-password') || '');
           }
 
-          // Handle nonoko redirect
           if (result.post.nonoko) {
             window.location.href = `/${result.post.boardUri}/`;
             return;
@@ -460,12 +401,9 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           if (typeof watchedThreads !== 'undefined') {
-            // A reply must not become the watched thread's label; the watcher
-            // takes it from the thread's OP (title, else the OP text).
             watchedThreads.autoWatchThread(result.post.threadId, result.post.boardUri, result.post.subject, result.post.message);
           }
 
-          // Hide quick reply after successful post
           document.getElementById('quickReply').classList.remove('show-quickreply');
         } else if (result.error) {
           if (result.error === 'flood') {
@@ -511,8 +449,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // The file cards are a copy of the reply form's (with their spoiler/NSFW choice), under
-  // an id of their own so the page never holds two #preview-container.
   function syncContent() {
     if (mainPreviewContainer) {
       const copy = mainPreviewContainer.cloneNode(true);
@@ -520,14 +456,12 @@ document.addEventListener('DOMContentLoaded', () => {
       copy.removeAttribute('style');
       qrFileSection.replaceChildren(copy);
       reattachEventListeners();
-      syncSpoilerRadios(); // Sync radio states after content update
+      syncSpoilerRadios(); 
     }
   }
 
-  // Initial sync
   syncContent();
 
-  // Keep synced with main form
   const observer = new MutationObserver(syncContent);
 
   if (mainPreviewContainer) {
@@ -561,6 +495,4 @@ function savePostPassword(postKey, password) {
   }
 }
 
-// Last, so the character count and the reply form's copy are already listening when a
-// page opened with `#q<id>` puts its quote in.
 quickReply();

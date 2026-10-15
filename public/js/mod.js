@@ -23,7 +23,6 @@ document.getElementById('emergency-toggle')?.addEventListener('click', async () 
   }
 });
 
-// The news editor (`/mod/news`) has its own script: public/js/mod-news.js.
 
 document.getElementById('mod-login-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -112,8 +111,6 @@ document.getElementById('mod-ip-delete-thread')?.addEventListener('click', async
   }
 });
 
-// `[Edit]` is handled by `public/js/edit-post.js` (a popup with the post's markup, a
-// raw-HTML switch and a live preview under the post).
 
 document.getElementById('mod-save-settings')?.addEventListener('click', async () => {
   try {
@@ -278,10 +275,6 @@ document.getElementById('board-create-form')?.addEventListener('submit', async (
   }
 });
 
-// Deleting a board takes every thread, post and uploaded file of it and cannot be
-// undone, so it goes through a popup that names the board first. The link is only
-// rendered for admins (`be/lib/mod/boards.js#deleteBoard`, the endpoint behind it is
-// `requireAdmin` too).
 let boardDeleteModal = null;
 let boardDeleteUri = null;
 
@@ -334,7 +327,6 @@ document.addEventListener('click', (e) => {
 
   const modal = buildBoardDeleteModal();
   boardDeleteUri = link.dataset.board;
-  // textContent, not innerHTML: a board name is whatever somebody typed into it.
   modal.querySelector('#board-delete-question').textContent = `Delete /${link.dataset.board}/ - ${link.dataset.name}?`;
   modal.querySelector('#board-delete-status').textContent = '';
   modal.querySelector('#board-delete-confirm').disabled = false;
@@ -417,8 +409,6 @@ document.querySelectorAll('.delete-global-filter').forEach((btn) => {
   });
 });
 
-// Moderation filters (vichan's $config['filters']): an enabled one can ban whoever trips it, so
-// switching one on says so before doing it.
 document.querySelectorAll('.toggle-moderation-filter').forEach((btn) => {
   btn.addEventListener('click', async () => {
     const turningOn = btn.dataset.enabled !== '1';
@@ -515,8 +505,6 @@ document.getElementById('clear-ip-role-form')?.addEventListener('submit', async 
   }
 });
 
-// The captcha switch lives here as well as on its own page (Mod -> Captcha), where the
-// picture, the character names and the ImageMagick settings are.
 document.getElementById('captcha-global-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const fd = new FormData(e.target);

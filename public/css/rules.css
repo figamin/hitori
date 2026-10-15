@@ -1,8 +1,3 @@
-/* /rules/ page.
- *
- * Same content layout as views/pages/rules.html, rendered inside the standard
- * site chrome (layout header + footer) and the usual box wrapper, so the rules
- * lists follow the active theme instead of the front page's own palette. */
 
 .rules-page .rules-intro {
   margin: 0 0 12px;

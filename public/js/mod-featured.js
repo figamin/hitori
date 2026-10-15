@@ -1,13 +1,3 @@
-// The front page's FEATURED THREADS box: the panel picks the threads and their
-// order. `/mod/featured` is the only page this runs on; the routes are
-// `be/routes/mod/featured.js` and the list is `koshi_featured_threads`.
-//
-// Two rules shape this screen, and both are enforced by the server as well:
-//
-//   * the box is four cards wide and is never narrower than four, so the list
-//     cannot be saved shorter than four (`minFeatured`);
-//   * only the first four are displayed, so a longer list is allowed but the
-//     extra slots say so instead of quietly disappearing.
 (() => {
   const data = document.getElementById('featured-data');
   const slotsBox = document.getElementById('featured-slots');
@@ -23,9 +13,6 @@
   const saveButton = document.getElementById('featured-save');
   const addButton = document.getElementById('featured-add');
 
-  // `_query` / `_results` / `_error` are per-slot screen state: the list is
-  // re-rendered from scratch on every change, and a search that was typed and
-  // not used yet should not vanish because another slot moved.
   let slots = (initial.featured || []).map((thread) => ({
     boardUri: thread.boardUri,
     threadId: thread.threadId,
@@ -58,7 +45,6 @@
 
   const boardName = (uri) => (boards.find((board) => board.uri === uri) || {}).name || uri;
 
-  // ------------------------------------------------------------------ the slots
 
   function fillBoards(select, selected) {
     select.textContent = '';
@@ -77,8 +63,6 @@
 
     node.querySelector('.featured-slot-number').textContent = `${index + 1}.`;
     if (index >= SHOWN) {
-      // It is stored, and it is not drawn on the front page. Saying so here is
-      // the only place anybody would find out.
       const warn = document.createElement('span');
       warn.className = 'featured-status';
       warn.textContent = `not shown (the front page draws the first ${SHOWN})`;
@@ -124,8 +108,6 @@
     idInput.value = slot.threadId || '';
     idInput.placeholder = 'thread #';
 
-    // A slot with nothing in it follows the board the picker is on, so "Use this
-    // thread" works without first choosing a thread.
     select.addEventListener('change', () => {
       if (!slot.threadId) slot.boardUri = select.value;
     });
@@ -160,7 +142,6 @@
       }
       const foundTitle = document.createElement('span');
       foundTitle.className = 'featured-result-title';
-      // The thread's own text is written as text, never as markup.
       foundTitle.textContent = found.title || '(no subject)';
       const meta = document.createElement('span');
       meta.className = 'featured-result-meta';
@@ -184,8 +165,6 @@
     moveDown.addEventListener('click', () => move(index, 1));
 
     const remove = node.querySelector('[data-remove]');
-    // Four is the floor the front page needs; removing below it is not offered
-    // rather than refused after the fact.
     remove.disabled = slots.length <= MIN;
     remove.title = remove.disabled ? `The front page shows ${SHOWN} featured threads, so ${MIN} is the fewest you can have` : 'Remove this thread';
     remove.addEventListener('click', () => {
@@ -208,7 +187,6 @@
     addButton.title = addButton.disabled ? `At most ${MAX} threads can be listed` : 'Add another thread';
   }
 
-  // ------------------------------------------------------------------ the edits
 
   function move(index, delta) {
     const target = index + delta;
@@ -229,7 +207,6 @@
       setStatus('A thread number is needed.', true);
       return;
     }
-    // The same thread twice would draw the same card twice.
     const clash = slots.findIndex((other, at) => at !== index && other.boardUri === boardUri && Number(other.threadId) === threadId);
     if (clash !== -1) {
       slot._error = `That thread is already in slot ${clash + 1}.`;
@@ -301,8 +278,6 @@
     saveButton.disabled = true;
     api('/mod/api/featured', { threads })
       .then((payload) => {
-        // The server's list is the truth from here on (it is what the front page
-        // will draw), so the screen is rebuilt from it.
         slots = (payload.featured || []).map((thread) => ({
           boardUri: thread.boardUri,
           threadId: thread.threadId,

@@ -1,18 +1,3 @@
-// The post editor. `[Edit]` opens a floating panel shaped like the quick reply
-// (`views/partials/quick-reply.ejs`): the post's source text, a button that switches the
-// box to the post's raw HTML, and — underneath the post being edited — a live preview of
-// what the post will look like, following every keystroke.
-//
-// The preview is a copy of the post's own markup with the new body dropped into it, so it
-// shows the real name, capcode, files and quotes around the text being written. Nothing in
-// it is live: its ids and `data-post-id`s are dropped, because the page's own scripts
-// (live reply refresh, reply renumbering, backlinks) walk exactly those selectors, and a
-// second copy of the post must not look like a post.
-//
-// Two modes, as vichan's editor has:
-//   markup — the box holds what the poster would type, and saving stores it the way
-//            posting does (escaped, filtered, converted to HTML)
-//   raw    — the box holds the post's HTML and is saved verbatim
 (function () {
   const PREVIEW_DELAY = 250;
 
@@ -53,7 +38,6 @@
     return data;
   }
 
-  // ---------------------------------------------------------------- the popup
 
   function buildPopup() {
     const popup = document.createElement('div');
@@ -86,7 +70,6 @@
     return popup;
   }
 
-  // Same drag behaviour as the quick reply: the header is the handle.
   function initDragging(element, handle) {
     let startX = 0;
     let startY = 0;
@@ -116,10 +99,7 @@
     handle.addEventListener('mousedown', startDrag);
   }
 
-  // ------------------------------------------------------------- the preview
 
-  // A copy of the post, inserted right after it and marked as a preview. Built once per
-  // open editor; only its body is replaced afterwards.
   function buildPreview() {
     removePreview();
 
@@ -130,7 +110,6 @@
     const clone = state.container.cloneNode(true);
     clone.removeAttribute('id');
     clone.querySelectorAll('[id]').forEach((node) => node.removeAttribute('id'));
-    // The live refresh, the reply numbering and the backlinks all key on these.
     clone.querySelectorAll('[data-post-id]').forEach((node) => node.removeAttribute('data-post-id'));
     clone.querySelectorAll('input[type="checkbox"]').forEach((node) => node.remove());
     wrapper.appendChild(clone);
@@ -162,7 +141,6 @@
         method: 'POST',
         body: { ...params, message: state.textarea.value, mode: state.mode }
       });
-      // A later keystroke may already have answered; only the newest one may paint.
       if (seq !== state.seq || !state.previewBody) return;
       state.previewBody.innerHTML = html;
       if (state.previewLabel) state.previewLabel.textContent = state.mode === 'raw' ? 'Preview (raw HTML)' : 'Preview';
@@ -171,7 +149,6 @@
     }
   }
 
-  // ---------------------------------------------------------------- the editor
 
   function applyMode() {
     if (state.mode === 'raw') {
@@ -184,8 +161,6 @@
   }
 
   function switchMode(next) {
-    // Keep what is in the box for the mode being left, so switching back and forth does
-    // not lose an edit (the other mode's value is what the server just handed over).
     state.values[state.mode] = state.textarea.value;
     state.mode = next;
     state.textarea.value = state.values[next] ?? '';
@@ -207,8 +182,6 @@
       state.mode = 'markup';
       applyMode();
       state.hint.textContent = '';
-      // Nothing may be typed into a box that is about to be filled from the server, and
-      // the answer is dropped if the mod has moved on to another post meanwhile.
       state.textarea.disabled = true;
       state.saveButton.disabled = true;
 
@@ -223,8 +196,6 @@
         if (state.link !== editLink) return;
         state.values.markup = data.source ?? '';
         state.values.raw = data.raw ?? '';
-        // A post with no source of its own (an imported one) has nothing but its HTML, so
-        // it can only be edited as raw HTML.
         state.mode = state.values.markup ? 'markup' : 'raw';
         state.textarea.value = state.values[state.mode];
         applyMode();

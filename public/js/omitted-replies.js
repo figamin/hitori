@@ -1,12 +1,3 @@
-// The newest-replies view of a thread. `be/routes/read.js` serves a thread opened with
-// `?last=` trimmed to its newest replies, and `views/thread.ejs` prints a line above the
-// first of them saying how many posts and image replies are missing. Clicking that line
-// loads the missing replies in front of the ones on the page, without a navigation.
-//
-// The replies come from the thread's public JSON (the one the auto refresh reads) and are
-// rendered one by one by the reply cell, exactly as `js/expansion.js` does for the five
-// replies a board page previews - so what is loaded has the same markup, moderation block
-// and behaviour as the replies the page came with.
 (function () {
   const CHUNK_SIZE = 10;
 
@@ -28,17 +19,12 @@
     const omittedLine = notice.querySelector('.omitted-posts');
     const expandedLine = notice.querySelector('.expanded-posts');
     const sentence = expandLink.textContent;
-    // `data-board` rather than the path: a moderator reads the same page under
-    // `/mod/thread/...`, where the first path segment is not the board.
     const { board, threadId, before } = notice.dataset;
 
     let loading = false;
     let earlier = null;
     let container = null;
 
-    // Everything older than the first reply the page came with, oldest first. The
-    // thread's JSON is already in that order; the filter is what keeps the line correct
-    // when it is clicked twice, or clicked after the thread has taken new replies.
     async function fetchEarlier() {
       const response = await fetch(`/${board}/thread/${threadId}.json`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -62,8 +48,6 @@
       try {
         if (!earlier) earlier = await fetchEarlier();
 
-        // Every reply the page hid has been deleted since it was rendered: the line has
-        // nothing left to offer, so it goes.
         if (!earlier.length) {
           container.remove();
           container = null;
@@ -81,8 +65,6 @@
                 body: JSON.stringify({
                   reply: { ...post, sage: Boolean(post.sage) },
                   thread: { threadId, boardUri: board },
-                  // The reply's real position in the thread, so whatever reads the number
-                  // still counts from the OP.
                   replyNumber: position + 1
                 })
               }).then((response) => {
@@ -96,8 +78,6 @@
           holder.innerHTML = cells.join('');
           while (holder.firstElementChild) container.appendChild(holder.firstElementChild);
 
-          // A little air between chunks, as `js/expansion.js` does, so a long thread does
-          // not lock the tab up.
           if (i + CHUNK_SIZE < earlier.length) await new Promise((resolve) => setTimeout(resolve, 50));
         }
 
@@ -106,7 +86,6 @@
         expandedLine.style.display = 'inline';
       } catch (error) {
         console.error('Error loading the earlier replies:', error);
-        // Nothing was added, so the line goes back to offering them.
         if (container) container.remove();
         container = null;
         earlier = null;
@@ -128,8 +107,6 @@
 
     collapseLink.addEventListener('click', (event) => {
       event.preventDefault();
-      // The container holds rendered posts, so it goes rather than hides: expanding again
-      // rebuilds it from the thread's replies as they are then.
       if (container) container.remove();
       container = null;
       expandedLine.style.display = 'none';

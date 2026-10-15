@@ -1,4 +1,3 @@
-// Store original thread list on page load
 document.addEventListener('DOMContentLoaded', function () {
   const threads = document.querySelector('#thread-container .threads');
   if (!threads) return;
@@ -80,7 +79,6 @@ function savePostPasswords(passwords) {
 }
 
 function generateRandomPassword() {
-  // Only a fallback: the server pre-fills the password box (see `post-form.ejs`).
   const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
   const bytes = new Uint8Array(8);
   crypto.getRandomValues(bytes);
@@ -91,8 +89,6 @@ function generateRandomPassword() {
 
 document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('form[action*="/thread"]').forEach((form) => {
-    // One submission at a time; see the note in `thread.js`. Without this a double click
-    // posted the new thread twice (the second attempt then meeting the flood filter).
     let posting = false;
     form.addEventListener('submit', async function (e) {
       e.preventDefault();
@@ -111,12 +107,6 @@ document.addEventListener('DOMContentLoaded', function () {
       try {
         const formData = new FormData(form);
         const boardUri = window.location.pathname.split('/')[1];
-        // The form comes pre-filled with a random 8 character password, and that is the
-        // value the reader can see, so it is the one that gets posted (and saved below
-        // for the delete menu). An emptied box means "a new one":
-        // `post-password.js#ensure` mints it and then leaves it in both boxes and
-        // remembers it, so the reader can read off the password this thread was signed
-        // with and their next post reuses it.
         const postPassword = window.postPassword
           ? window.postPassword.ensure()
           : String(formData.get('post-password') || '').trim() || generateRandomPassword();
@@ -128,7 +118,6 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         }
 
-        // Keep the password the form was submitted with.
         formData.set('post-password', postPassword);
 
         const response = await fetch(form.getAttribute('action'), {
@@ -176,9 +165,6 @@ document.addEventListener('DOMContentLoaded', function () {
               alert('You are banned from posting.');
             }
           } else {
-            // The server's own wording when it sent one: the captcha gate answers with a code
-            // and a message (`{error: 'captcha', message: 'Solve the captcha before posting.'}`),
-            // and showing the bare code would be no help at all.
             alert(result.message || result.error || 'Error creating thread');
           }
         } else if (!response.ok) {

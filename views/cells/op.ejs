@@ -5,10 +5,6 @@ var msg = thread.markdown;
 if (locals.isArchive) msg = msg.replace(/href=["']\/([\w-]+)\/thread\/(\d+)(?:#(\d+))?["']/gi, function(_, b, t, p) { return 'href="/' + b + '/archive/thread/' + t + (p ? '#' + p : '') + '"'; });
 var omitted = thread.omittedReplies ?? thread.totalReplies - 5;
 var role = thread.signedRole;
-// Opening the thread from the mod panel should keep the moderator there (that is
-// how the panel's own pagination already behaves). The number link is left on the
-// public thread, since that is where the reply form the "reply to this post" link
-// fills in lives - the moderator thread view has none.
 var threadHref = modView ? '/mod/thread/' + boardUri + '/' + id : href;
 var controls = modView || locals.modControls;
 %>
@@ -31,10 +27,7 @@ var controls = modView || locals.modControls;
   <%- include('../partials/time', { date: thread.creation }) %> 
   <span class="post-num">
     <a class="linkQuote" title="Link to this post" href="<%= threadHref %>#<%= id %>">No.</a><a class="linkQuote" title="Reply to this post" href="<%= href %>#q<%= id %>"><%= id %></a>
-    <% if (!locals.isThread) { %> <span>[<a href="<%= href %>" class="reply-link">Reply</a>]</span><%#
-      The newest-replies view of the thread (`?last=`, `be/routes/read.js`). A thread
-      too short to be trimmed would only open as it does without the parameter, and an
-      archived thread's page does not trim at all, so neither gets the link. %>
+    <% if (!locals.isThread) { %> <span>[<a href="<%= href %>" class="reply-link">Reply</a>]</span>
     <% if (!locals.isArchive && (thread.totalReplies || 0) > 50) { %> <span>[<a href="<%= href %>?last=50" class="reply-link last-posts-link" title="Only the 50 newest replies">Last 50 Posts</a>]</span><% } %><% } %>
   </span>
   <% if (controls) { %>
@@ -54,7 +47,7 @@ var controls = modView || locals.modControls;
   </span>
   <% } %>
 </div>
-<%# A ban or warning notice is part of the post's text, under what was written - as on 4chan. %>
+
 <blockquote class="thread-content" id="m<%= id %>"><%- msg %><% if (thread.warningMessage) { %><%- include('../partials/warning-message', { message: thread.warningMessage }).trim() %><% } else if (thread.banMessage) { %><div class="ban-message"><%- thread.banMessage %></div><% } %></blockquote>
 <% if (thread.poll) { %>
 <%- include('poll', { poll: thread.poll }) %>

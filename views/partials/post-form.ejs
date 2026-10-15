@@ -28,11 +28,7 @@
 
 </style>
     
-<%# A text board takes no uploads (`models/forms/makeThread.js` refuses a file on one), so its
-    forms include this partial with `textBoard: true` (`partials/post-form-text.ejs`, and
-    `textthread.ejs` for the reply form): the attachment-type selector, the File/Embed row, the
-    Tegaki button and the file rules stay out, and the poll editor - which has no other way to
-    be opened on such a board - is shown instead of hidden. %>
+
 <% const textBoard = locals.textBoard === true; %>
 <table id="postformTable">
     <tbody>
@@ -45,11 +41,7 @@
         <tr>
             <td class="post-block"><label>Options</label></td>
             <td class="postform-input-cell">
-                <%# A dropdown of checkboxes. The closed box is a real <select> (no name, so it
-                    is never posted, and it ignores clicks) so it looks like every other
-                    dropdown; it names what is ticked. Clicking it opens the <details> - which
-                    works without scripts too; the script below keeps the label current and
-                    closes the menu on a click elsewhere. %>
+                
                 <details class="post-options" id="post-options">
                     <summary><select class="input-text post-options-select" tabindex="-1" aria-hidden="true"><option class="post-options-label">None</option></select></summary>
                     <div class="post-options-menu">
@@ -116,10 +108,10 @@
             <td class="postform-input-cell">
                 <details id="emo" class="emoclass">
                     <summary>Show Emotes</summary>
-                    <%# Lazy so the ~17 emote GIFs (300 KB+) stay out of the initial load: %>
-                    <%# they live behind <details>, and the browser skips a lazy image with %>
-                    <%# no layout box until the picker is opened. `decoding="async"` keeps %>
-                    <%# them off the main thread when they do arrive. %>
+                    
+                    
+                    
+                    
                     <img src="/static/emotes/mikuwelcome.gif" title="mikuwelcome" alt="mikuwelcome" class="emote" height="45" loading="lazy" decoding="async">
                     <img src="/static/emotes/mikuhappy.gif" title="mikuhappy" alt="mikuhappy" class="emote" height="45" loading="lazy" decoding="async">
                     <img src="/static/emotes/rinthumbs.gif" title="rinthumbs" alt="rinthumbs" class="emote" height="45" loading="lazy" decoding="async">
@@ -222,8 +214,6 @@
             const ticked = boxes.filter(function(cb) { return cb.checked; }).map(function(cb) { return cb.parentNode.textContent.trim(); });
             label.textContent = ticked.length ? ticked.join(', ') : 'None';
         }
-        // The quick reply ticks these too (qr.js mirrors its own boxes onto them), and a
-        // posted form is reset, so the label follows every change on the page.
         document.addEventListener('change', function(e) {
             if (e.target instanceof HTMLInputElement && e.target.type === 'checkbox') updateLabel();
         });

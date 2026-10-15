@@ -1,6 +1,4 @@
 <%
-// See cells/op.ejs: the mod panel keeps thread links inside the panel, the number
-// link stays public because that is where the reply form is.
 var archivePrefix = locals.isArchive ? 'archive/' : '';
 var href = '/' + boardUri + '/' + archivePrefix + 'thread/' + thread.threadId;
 var threadHref = modView ? '/mod/thread/' + boardUri + '/' + thread.threadId : href;

@@ -403,7 +403,6 @@
     });
 })();
 
-//hail vocadb
 
 (function () {
   "use strict";
@@ -788,7 +787,6 @@
 (function () {
     'use strict';
 
-    // you already know what this does
     var currentYear = new Date().getFullYear();
     var yearRangePattern = /(©\s*\d{4}-)\d{4}/;
 
@@ -806,7 +804,6 @@
 (function () {
     'use strict';
 
-    // Topbar search: pressing Enter submits to the Express /search route.
     var input = document.getElementById('searchInput');
     if (!input) return;
 
