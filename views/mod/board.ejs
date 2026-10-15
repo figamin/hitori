@@ -23,6 +23,7 @@
 <label><input type="checkbox" name="archivePrunedThreads" value="1" <%= s.includes('archivePrunedThreads') ? 'checked' : '' %>> Archive threads bumped off the index</label>
 <label><input type="checkbox" name="textBoard" value="1" <%= s.includes('textBoard') ? 'checked' : '' %>> Textboard</label>
 <label><input type="checkbox" name="unindex" value="1" <%= s.includes('unindex') ? 'checked' : '' %>> Hide board</label>
+<label title="The board stays in the header and works as always on its own pages; only its threads are left out of /all/ and the front page's active threads and recent posts."><input type="checkbox" name="hideFromAggregate" value="1" <%= s.includes('hideFromAggregate') ? 'checked' : '' %>> Hide from /all/ and the front page</label>
 </td></tr>
 </table>
 </fieldset>
