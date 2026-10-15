@@ -24,7 +24,7 @@
 <%- include('partials/footer', { boardFooter: boardFooter }) %>
 <% if (mod || locals.modControls) { %><script src="/js/mod.js?v=<%= locals.assetVersion('js/mod.js') %>"></script><script src="/js/edit-post.js?v=<%= locals.assetVersion('js/edit-post.js') %>"></script><% } %>
 <script src="/js/captcha.js?v=<%= locals.assetVersion('js/captcha.js') %>"></script>
-<script src="/js/thumb.js"></script>
+<script src="/js/thumb.js?v=<%= locals.assetVersion('js/thumb.js') %>"></script>
 <script src="/js/thread-watcher.js"></script>
 <script src="/js/settings.js"></script>
 <script>

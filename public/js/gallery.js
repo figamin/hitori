@@ -36,7 +36,11 @@
     const items = [];
     document.querySelectorAll('.media-toggle').forEach((link) => {
       const mime = link.getAttribute('data-mime') || '';
-      const isImage = mime.startsWith('image/');
+      // A browser that cannot decode JPEG XL gets no slide for one: the picture would
+      // be blank there, and the plain link still offers the file (`thumb.js` holds the
+      // test; a page without it treats the format as unshowable, which is the safe way
+      // round).
+      const isImage = mime.startsWith('image/') && (mime !== 'image/jxl' || (window.supportsJxl?.() ?? false));
       const isVideo = mime.startsWith('video/');
       if (!isImage && !isVideo) return;
       const img = link.querySelector('img');
