@@ -113,9 +113,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const boardUri = window.location.pathname.split('/')[1];
         // The form comes pre-filled with a random 8 character password, and that is the
         // value the reader can see, so it is the one that gets posted (and saved below
-        // for the delete menu). Only invent one if the box was emptied.
-        const typedPassword = String(formData.get('post-password') || '').trim();
-        const postPassword = typedPassword || generateRandomPassword();
+        // for the delete menu). An emptied box means "a new one":
+        // `post-password.js#ensure` mints it and then leaves it in both boxes and
+        // remembers it, so the reader can read off the password this thread was signed
+        // with and their next post reuses it.
+        const postPassword = window.postPassword
+          ? window.postPassword.ensure()
+          : String(formData.get('post-password') || '').trim() || generateRandomPassword();
 
         formData.delete('image');
         if (fileInput && fileInput.files && fileInput.files.length > 0) {

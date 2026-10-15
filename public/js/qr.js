@@ -384,6 +384,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    // An emptied password box means "a new one": `post-password.js#ensure` mints it,
+    // leaves it in both boxes and remembers it, so the reader can read off the password
+    // this reply was signed with and their next post reuses it. Without this the quick
+    // reply posted the empty string, which the server refuses.
+    if (window.postPassword && typeof window.postPassword.ensure === 'function') {
+      formData.set('post-password', window.postPassword.ensure());
+    }
+
     // Add files from main form
     // An embed is posted without files, as the reply form does (it disables its input).
     if (mainFileInput && !mainFileInput.disabled && mainFileInput.files.length > 0) {

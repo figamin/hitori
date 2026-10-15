@@ -427,9 +427,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const formData = new FormData(mainReplyForm);
 
       // The box is pre-filled with the reader's remembered password (see
-      // `post-password.js`), so post what is in it; only invent one if it is empty.
-      const typedPassword = String(formData.get('post-password') || '').trim();
-      const postPassword = typedPassword || generateRandomPassword();
+      // `post-password.js`), so post what is in it. An emptied box means "a new one":
+      // `post-password.js#ensure` mints it, shows it in *both* boxes and remembers it, so
+      // the reader can read off the password this reply was signed with and their next
+      // post reuses it. (`generateRandomPassword` stays as the fallback for a page whose
+      // copy of that script is older than this handler.)
+      const postPassword = window.postPassword
+        ? window.postPassword.ensure()
+        : String(formData.get('post-password') || '').trim() || generateRandomPassword();
       formData.set('post-password', postPassword);
 
       formData.delete('image');
