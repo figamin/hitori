@@ -79,6 +79,8 @@ document.addEventListener('click', async function (event) {
     if (response.ok && data.success) {
       const refreshed = await renderPollCell(container, data.poll);
       if (!refreshed) location.reload();
+    } else if (response.status === 403 && /csrf/i.test(data.error || '')) {
+      alert('This site could not verify the vote because your browser is not sending it cookies. Allow cookies for this site, reload the page and try again.');
     } else {
       alert(data.error || `Vote failed (HTTP ${response.status})`);
     }
