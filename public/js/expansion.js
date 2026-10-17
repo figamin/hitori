@@ -19,13 +19,16 @@ window.initializeExpansion = function () {
         try {
           isExpanding = true;
           const currentPath = location.pathname.split('/').filter((p) => p)[0];
+          const threadRoot = footer.closest('.thread');
           const boardUri =
-            currentPath === 'all'
+            threadRoot?.querySelector('[data-board]')?.getAttribute('data-board') ||
+            (currentPath === 'all'
               ? footer
                   .closest('.thread')
                   .querySelector('a[href^="/"]')
                   .textContent.match(/\/(\w+)\//)[1]
-              : currentPath;
+              : currentPath);
+          const modView = Boolean(window.modBoardUri);
 
           const response = await fetch(`/${boardUri}/thread/${threadId}.json`);
           if (!response.ok) throw new Error('Network response was not ok');
@@ -55,7 +58,8 @@ window.initializeExpansion = function () {
                   body: JSON.stringify({
                     replies: batch,
                     replyNumbers: batch.map((reply) => positions.get(String(reply.postId)) || 0),
-                    thread: { threadId, boardUri }
+                    thread: { threadId, boardUri },
+                    modView
                   })
                 });
                 if (!cellResponse.ok) throw new Error(`HTTP ${cellResponse.status}`);
